@@ -38,7 +38,12 @@ module HashDeepDiff
 
     def delta
       common_keys.each_with_object({}) do |key, memo|
-        memo[key] = right[key] unless right[key] == left[key]
+        next if right[key] == left[key]
+
+        memo[key] = {
+          left: left[key],
+          right: right[key]
+        }
       end
     end
 
