@@ -1,0 +1,11 @@
+require:
+  - rubocop/cop/internal_affairs
+  - rubocop-minitest
+  - rubocop-rake
+AllCops:
+  NewCops: enable
+  Exclude:
+    - 'vendor/**/*'
+    - '.git/**/*'
+    - '.bundle/**/*'
+    - 'bin/*'
