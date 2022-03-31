@@ -4,8 +4,14 @@
 module HashDeepDiff
   # :nodoc:
   class Comparison
+    attr_reader :left, :right
+
     def diff
-      {}
+      return {} if left == right  # this is rder-sensitive comparison
+      return left if right.empty?
+      return right if left.empty?
+
+      return {}
     end
 
     private
