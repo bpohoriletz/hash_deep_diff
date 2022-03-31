@@ -24,9 +24,9 @@ module HashDeepDiff
 
     def first_level_delta
       [
-        right_delta,
+        left_delta,
         delta,
-        left_delta
+        right_delta
       ]
     end
 
