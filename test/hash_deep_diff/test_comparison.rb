@@ -37,7 +37,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal([{}, {}, { a: 'b' }], diff)
+      assert_equal([{ a: 'b' }, {}, {}], diff)
     end
   end
 end
