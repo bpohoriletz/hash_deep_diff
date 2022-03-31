@@ -10,7 +10,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_empty(diff)
+      assert_equal([{}, {}, {}], diff)
     end
 
     it 'returns left if right is empty' do
@@ -19,7 +19,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal(left, diff)
+      assert_equal([left, {}, {}], diff)
     end
 
     it 'returns right if left is empty' do
@@ -28,7 +28,16 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal(right, diff)
+      assert_equal([{}, {}, right], diff)
+    end
+
+    it 'returns difference for one-level deep hash with string values' do
+      left = { a: 'b', c: 'd', e: 'f' }
+      right = { c: 'd', e: 'f' }
+
+      diff = HashDeepDiff::Comparison.new(left, right).diff
+
+      assert_equal([{}, {}, { a: 'b' }], diff)
     end
   end
 end
