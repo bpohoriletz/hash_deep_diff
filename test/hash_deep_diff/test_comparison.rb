@@ -39,5 +39,14 @@ describe HashDeepDiff::Comparison do
 
       assert_equal([{ a: 'b' }, {}, {}], diff)
     end
+
+    it 'returns difference for one-level deep hash with numeric values' do
+      left = { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6 }
+      right = { b: 1, c: 3, d: 4, e: 5, f: 6, g: 7 }
+
+      diff = HashDeepDiff::Comparison.new(left, right).diff
+
+      assert_equal([{ a: 1 }, { b: { left: 2, right: 1 } }, { g: 7 }], diff)
+    end
   end
 end
