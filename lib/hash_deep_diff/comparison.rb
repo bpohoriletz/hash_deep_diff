@@ -4,6 +4,10 @@
 module HashDeepDiff
   # :nodoc:
   class Comparison
+    def diff
+      {}
+    end
+
     private
 
     def initialize(left, right)
