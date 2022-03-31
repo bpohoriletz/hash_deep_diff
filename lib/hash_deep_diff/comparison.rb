@@ -6,11 +6,11 @@ module HashDeepDiff
   class Comparison
     attr_reader :left, :right
 
-    def diff
+    def diff(&block)
       return [{}, {}, {}] if left == right  # this is order-sensitive comparison
       return [left, {}, {}] if right.empty?
       return [{}, {}, right] if left.empty?
-      return first_level_delta if one_level_deep?
+      return first_level_delta(&block) if one_level_deep?
 
       return nil
     end
@@ -22,10 +22,10 @@ module HashDeepDiff
       @right = right.to_hash
     end
 
-    def first_level_delta
+    def first_level_delta(&block)
       [
         left_delta,
-        delta,
+        delta(&block),
         right_delta
       ]
     end
@@ -36,13 +36,18 @@ module HashDeepDiff
       end
     end
 
-    def delta
+    def delta(&block)
+      block ||= ->(val) { val }
+
       common_keys.each_with_object({}) do |key, memo|
-        next if right[key] == left[key]
+        value_left = block.call(left[key])
+        value_right = block.call(right[key])
+
+        next if value_right.instance_of?(value_left.class) && (value_right == value_left)
 
         memo[key] = {
-          left: left[key],
-          right: right[key]
+          left: value_left,
+          right: value_right
         }
       end
     end
@@ -54,8 +59,8 @@ module HashDeepDiff
     end
 
     def one_level_deep?
-      left.values.none? { |value| value.respond_to?(:to_ary) || value.respond_to?(:to_hash) } &&
-        right.values.none? { |value| value.respond_to?(:to_ary) || value.respond_to?(:to_hash) }
+      left.values.none? { |value| value.respond_to?(:to_hash) } &&
+        right.values.none? { |value| value.respond_to?(:to_hash) }
     end
 
     def common_keys
