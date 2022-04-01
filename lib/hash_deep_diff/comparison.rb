@@ -12,7 +12,7 @@ module HashDeepDiff
       return [{}, {}, right] if left.empty?
       return first_level_delta(&block) if one_level_deep?
 
-      return nil
+      return [left_delta, deep_delta(&block), right_delta]
     end
 
     private
@@ -20,6 +20,15 @@ module HashDeepDiff
     def initialize(left, right)
       @left = left.to_hash
       @right = right.to_hash
+    end
+
+    def deep_delta(&block)
+      result = delta(&block)
+      result.keys.each_with_object({}) do |key, memo|
+        memo[key] = result[key] && next unless left[key].instance_of?(Hash)
+
+        memo[key] = self.class.new(left[key], right[key]).diff
+      end
     end
 
     def first_level_delta(&block)
