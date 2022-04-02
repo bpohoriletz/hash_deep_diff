@@ -5,7 +5,7 @@ module Support
     attr_reader :filename
 
     def fetch(reload: false)
-      (reload && read) || (@data ||= read)
+      (reload && read) || (@data ||= read || {})
     end
 
     def read
