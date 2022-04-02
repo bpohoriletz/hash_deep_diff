@@ -5,8 +5,8 @@ require 'test_helper'
 describe HashDeepDiff::Comparison do
   describe '#diff' do
     it 'finds an empty hash if left quals right' do
-      left = load_fixture(name: 'one_level/basic')
-      right = load_fixture(name: 'one_level/basic')
+      left = load_fixture('one_level/small')
+      right = load_fixture('one_level/small')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -14,8 +14,8 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds left if right is empty' do
-      left = { a: :b }
-      right = {}
+      left = load_fixture('one_level/small')
+      right = load_fixture('empty')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -23,8 +23,8 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds right if left is empty' do
-      left = {}
-      right = { c: :d }
+      left = load_fixture('empty')
+      right = load_fixture('one_level/small')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -32,8 +32,8 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for one level deep hash with string values' do
-      left = { a: 'b', c: 'd', e: 'f' }
-      right = { c: 'd', e: 'f' }
+      left = load_fixture('one_level/big')
+      right = load_fixture('one_level/medium')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -41,26 +41,31 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for one level deep hash with numeric values' do
-      left = { a: 1, b: 2.0, c: 3, d: 4, e: 5, f: 6 }
-      right = { b: 1, c: 3, d: 4, e: 5, f: 6, g: 7 }
+      left = load_fixture('one_level/huge')
+      right = load_fixture('one_level/huge')
+      right.merge!({ z: 'z', c: 'ccc' })
+      right.delete(:a)
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal([{ a: 1 }, { b: { left: 2.0, right: 1 } }, { g: 7 }], diff)
+      assert_equal([{ a: 'a' }, { c: { left: 3, right: 'ccc' } }, { z: 'z' }], diff)
     end
 
     it 'finds difference for one level deep hash with values of core types' do
-      left = { a: 1, b: 1, c: '3', d: :d, e: 5, f: 6 }
-      right = { b: 1, c: 3.0, d: :d, e: 5, f: 6, g: Set[1, 2] }
+      left = load_fixture('one_level/huge')
+      right = load_fixture('one_level/huge')
+      right.merge!({ g: Set[1, 2] })
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal([{ a: 1 }, { c: { left: '3', right: 3.0 } }, { g: Set[1, 2] }], diff)
+      assert_equal([{}, { g: { left: 'ggg', right: Set[1, 2] } }, {}], diff)
     end
 
     it 'finds difference for one level deep hash with unsorted arrays' do
-      left = { a: 'b', c: [1, 2, 3], e: 'f' }
-      right = { a: 'b', c: [1, 3, 2], e: 'f' }
+      left = load_fixture('one_level/big')
+      right = load_fixture('one_level/big')
+      left.merge!({ c: [1, 2, 3] })
+      right.merge!({ c: [1, 3, 2] })
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -68,8 +73,10 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for one level deep hash with converted values' do
-      left = { a: 'b', c: [1, 2, 3], e: 'f' }
-      right = { a: 'b', c: [1, 3, 2], e: 'f' }
+      left = load_fixture('one_level/big')
+      right = load_fixture('one_level/big')
+      left.merge!({ c: [1, 2, 3] })
+      right.merge!({ c: [1, 3, 2] })
 
       diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
 
@@ -77,52 +84,36 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for two level deep hash with string values' do
-      left = { a: 'b', c: { d: '2' }, e: 'f' }
-      right = { a: 'b', c: { d: '3' }, e: 'f' }
+      left = load_fixture('two_level/big')
+      right = load_fixture('two_level/big')
+      right.merge!({ b: { c: 'd' } })
 
       diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
 
-      assert_equal([{}, { c: [{}, { d: { left: '2', right: '3' } }, {}] }, {}], diff)
+      assert_equal([{}, { b: [{}, { c: { left: 'c', right: 'd' } }, {}] }, {}], diff)
     end
 
     it 'finds difference for two level deep hash with numeric values' do
-      left = { a: 'b', c: { d: 2 }, e: 'f' }
-      right = { a: 'b', c: { d: 2.0, e: 3 }, e: 'f' }
+      left = load_fixture('two_level/big')
+      right = load_fixture('two_level/big')
+      right.merge!({ b: { c: 'd', e: 3 } })
 
       diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
 
-      assert_equal([{}, { c: [{}, { d: { left: 2.0, right: 2.0 } }, { e: 3 }] }, {}], diff)
+      assert_equal([{}, { b: [{}, { c: { left: 'c', right: 'd' } }, { e: 3 }] }, {}], diff)
     end
 
     it 'finds difference for three level deep hash with numeric values' do
-      left = { a: 'b', c: { d: 2 }, e: 'f', g: { h: { i: :j } } }
-      right = { a: 'b', c: { d: 2.0, e: 3 }, e: 'f', g: { h: { i: :i } } }
+      left = load_fixture('n_level/big')
+      right = load_fixture('n_level/huge')
+      right.merge!({ f: { g: { h: 'j' } } })
 
-      diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
+      diff = HashDeepDiff::Comparison.new(left, right).diff
 
       assert_equal(
-        [
-          {},
-          {
-            c: [
-              {},
-              { d: { left: 2, right: 2.0 } },
-              { e: 3 }
-            ],
-            g: [
-              {},
-              {
-                h: [
-                  {},
-                  { i: { left: :j, right: :i } },
-                  {}
-                ]
-              },
-              {}
-            ]
-          },
-          {}
-        ], diff
+        [{}, { b: [{}, {}, { d: 'd' }], f: [{}, { g: [{}, { h: { left: 'h', right: 'j' } }, {}] }, {}] },
+         { a: 'a' }],
+        diff
       )
     end
   end

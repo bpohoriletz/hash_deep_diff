@@ -10,7 +10,7 @@ module Support
     end
 
     module InstanceMethods
-      def load_fixture(name:)
+      def load_fixture(name)
         Fixture.new(name: name).fetch
       end
     end
