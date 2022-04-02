@@ -5,8 +5,7 @@ require 'test_helper'
 describe HashDeepDiff::Comparison do
   describe '#diff' do
     it 'finds an empty hash if left quals right' do
-      left = load_fixture('one_level/small')
-      right = load_fixture('one_level/small')
+      left, right = load_fixture('one_level/small', 'one_level/small')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -14,8 +13,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds left if right is empty' do
-      left = load_fixture('one_level/small')
-      right = load_fixture('empty')
+      left, right = load_fixture('one_level/small', 'empty')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -23,8 +21,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds right if left is empty' do
-      left = load_fixture('empty')
-      right = load_fixture('one_level/small')
+      left, right = load_fixture('empty', 'one_level/small')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -32,8 +29,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for one level deep hash with string values' do
-      left = load_fixture('one_level/big')
-      right = load_fixture('one_level/medium')
+      left, right = load_fixture('one_level/big', 'one_level/medium')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -41,8 +37,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for one level deep hash with numeric values' do
-      left = load_fixture('one_level/huge')
-      right = load_fixture('one_level/huge')
+      left, right = load_fixture('one_level/huge', 'one_level/huge')
       right.merge!({ z: 'z', c: 'ccc' })
       right.delete(:a)
 
@@ -52,8 +47,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for one level deep hash with values of core types' do
-      left = load_fixture('one_level/huge')
-      right = load_fixture('one_level/huge')
+      left, right = load_fixture('one_level/huge', 'one_level/huge')
       right.merge!({ g: Set[1, 2] })
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
@@ -62,8 +56,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for one level deep hash with unsorted arrays' do
-      left = load_fixture('one_level/big')
-      right = load_fixture('one_level/big')
+      left, right = load_fixture('one_level/big', 'one_level/big')
       left.merge!({ c: [1, 2, 3] })
       right.merge!({ c: [1, 3, 2] })
 
@@ -73,8 +66,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for one level deep hash with converted values' do
-      left = load_fixture('one_level/big')
-      right = load_fixture('one_level/big')
+      left, right = load_fixture('one_level/big', 'one_level/big')
       left.merge!({ c: [1, 2, 3] })
       right.merge!({ c: [1, 3, 2] })
 
@@ -84,8 +76,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for two level deep hash with string values' do
-      left = load_fixture('two_level/big')
-      right = load_fixture('two_level/big')
+      left, right = load_fixture('two_level/big', 'two_level/big')
       right.merge!({ b: { c: 'd' } })
 
       diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
@@ -94,8 +85,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for two level deep hash with numeric values' do
-      left = load_fixture('two_level/big')
-      right = load_fixture('two_level/big')
+      left, right = load_fixture('two_level/big', 'two_level/big')
       right.merge!({ b: { c: 'd', e: 3 } })
 
       diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
@@ -104,8 +94,7 @@ describe HashDeepDiff::Comparison do
     end
 
     it 'finds difference for three level deep hash with numeric values' do
-      left = load_fixture('n_level/big')
-      right = load_fixture('n_level/huge')
+      left, right = load_fixture('n_level/big', 'n_level/huge')
       right.merge!({ f: { g: { h: 'j' } } })
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
