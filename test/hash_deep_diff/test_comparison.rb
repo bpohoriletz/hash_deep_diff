@@ -114,7 +114,7 @@ describe HashDeepDiff::Comparison do
               {
                 h: [
                   {},
-                  { i: { left: :j, right: :i  } },
+                  { i: { left: :j, right: :i } },
                   {}
                 ]
               },
@@ -122,7 +122,8 @@ describe HashDeepDiff::Comparison do
             ]
           },
           {}
-        ], diff)
+        ], diff
+      )
     end
   end
 end
