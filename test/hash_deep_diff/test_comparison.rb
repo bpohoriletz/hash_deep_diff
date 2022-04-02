@@ -5,8 +5,8 @@ require 'test_helper'
 describe HashDeepDiff::Comparison do
   describe '#diff' do
     it 'finds an empty hash if left quals right' do
-      left = { a: :b }
-      right = { a: :b }
+      left = load_fixture(name: 'one_level/basic')
+      right = load_fixture(name: 'one_level/basic')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 

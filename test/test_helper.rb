@@ -6,5 +6,7 @@ require 'minitest/reporters'
 require 'pry'
 require 'hash_deep_diff'
 require_relative 'support/fixture'
+require_relative 'support/extensions'
 
+Minitest::Test.include(Support::Extensions)
 Minitest::Reporters.use!
