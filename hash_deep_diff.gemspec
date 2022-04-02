@@ -44,6 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'guard-minitest', '~> 2.4.6'
   spec.add_development_dependency 'guard-rubocop', '~> 1.5.0'
   spec.add_development_dependency 'minitest', '~> 5.15.0'
+  spec.add_development_dependency 'minitest-focus', '~> 1.3.1'
   spec.add_development_dependency 'minitest-reporters', '~> 1.5.0'
   spec.add_development_dependency 'rake', '~> 10.5.0'
   spec.add_development_dependency 'rubocop', '~> 1.26.1'

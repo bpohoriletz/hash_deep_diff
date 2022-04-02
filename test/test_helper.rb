@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require 'minitest/autorun'
-require 'minitest/spec'
+require 'minitest/focus'
 require 'minitest/reporters'
+require 'minitest/spec'
+
 require 'pry'
 require 'hash_deep_diff'
 require_relative 'support/fixture'

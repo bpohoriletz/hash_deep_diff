@@ -15,6 +15,28 @@ module HashDeepDiff
       return [left_delta, deep_delta(&block), right_delta]
     end
 
+    def report(&block)
+      extra, delta, missing = diff(&block)
+
+      lines = extra.each_with_object([]) do |(key, value), memo|
+        memo << "+left[#{key}] = #{value}"
+      end
+
+      lines += missing.each_with_object([]) do |(key, value), memo|
+        memo << "-left[#{key}] = #{value}"
+      end
+
+      lines += delta.each_with_object([]) do |(key, value), memo|
+        line = <<~Q
+          -left[#{key}] = #{value[:left]}
+          +right[#{key}] = #{value[:right]}
+        Q
+        memo << line
+      end
+
+      return lines.join("\n")
+    end
+
     private
 
     def initialize(left, right)
