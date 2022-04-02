@@ -106,4 +106,37 @@ describe HashDeepDiff::Comparison do
       )
     end
   end
+
+  describe '#report (for one level deep hashes) ' do
+    it 'lists elements not found on the right' do
+      left, right = load_fixture('one_level/small', 'empty')
+
+      report = HashDeepDiff::Comparison.new(left, right).report
+
+      assert_equal('+left[a] = b', report)
+    end
+
+    it 'lists elements missing on the left' do
+      left, right = load_fixture('empty', 'one_level/small')
+
+      report = HashDeepDiff::Comparison.new(left, right).report
+
+      assert_equal('-left[a] = b', report)
+    end
+
+    it 'lists elements that are different' do
+      left, right = load_fixture('one_level/big', 'one_level/big')
+      left.merge!({ c: [1, 2, 3] })
+      right.merge!({ c: [1, 3, 2] })
+
+      report = HashDeepDiff::Comparison.new(left, right).report
+
+      expected = <<~Q
+        -left[c] = [1, 2, 3]
+        +right[c] = [1, 3, 2]
+      Q
+
+      assert_equal(expected, report)
+    end
+  end
 end
