@@ -14,8 +14,8 @@ module Support
 
     private
 
-    def initialize(relative_name)
-      @filename = File.expand_path("#{relative_name}.yml", __dir__)
+    def initialize(name:)
+      @filename = File.expand_path("#{name}.yml", __dir__)
     end
   end
 end
