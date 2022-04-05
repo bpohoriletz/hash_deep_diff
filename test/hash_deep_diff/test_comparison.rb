@@ -170,5 +170,32 @@ describe HashDeepDiff::Comparison do
 
       assert_equal(diff, report)
     end
+
+    it 'lists elements not found on the left for simple hashes' do
+      left, right = load_fixture('two_level/big', 'two_level/big')
+      left.delete(:b)
+      diff = <<~Q
+        -left[b][c] = c
+        -left[b][d] = d
+      Q
+
+      report = HashDeepDiff::Comparison.new(left, right).report + "\n"
+
+      assert_equal(diff, report)
+    end
+
+    it 'lists elements not found on the left for complex hashes' do
+      left, right = load_fixture('two_level/huge', 'two_level/huge')
+      left.delete(:b)
+      diff = <<~Q
+        -left[b][c] = c
+        -left[b][d] = d
+        -left[b][e] = [1, 2, 3]
+      Q
+
+      report = HashDeepDiff::Comparison.new(left, right).report + "\n"
+
+      assert_equal(diff, report)
+    end
   end
 end
