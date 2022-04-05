@@ -3,7 +3,7 @@
 require 'test_helper'
 
 describe HashDeepDiff::Comparison do
-  describe '#diff' do
+  describe '#diff (for one level deep hashes)' do
     it 'finds an empty hash if left quals right' do
       left, right = load_fixture('one_level/small', 'one_level/small')
 
@@ -28,7 +28,7 @@ describe HashDeepDiff::Comparison do
       assert_equal([{}, {}, right], diff)
     end
 
-    it 'finds difference for one level deep hash with string values' do
+    it 'finds difference for hash with string values' do
       left, right = load_fixture('one_level/big', 'one_level/medium')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
@@ -36,7 +36,7 @@ describe HashDeepDiff::Comparison do
       assert_equal([{ a: 'b' }, {}, {}], diff)
     end
 
-    it 'finds difference for one level deep hash with numeric values' do
+    it 'finds difference for hash with numeric values' do
       left, right = load_fixture('one_level/huge', 'one_level/huge')
       right.merge!({ z: 'z', c: 'ccc' })
       right.delete(:a)
@@ -46,7 +46,7 @@ describe HashDeepDiff::Comparison do
       assert_equal([{ a: 'a' }, { c: { left: 3, right: 'ccc' } }, { z: 'z' }], diff)
     end
 
-    it 'finds difference for one level deep hash with values of core types' do
+    it 'finds difference for hash with values of core types' do
       left, right = load_fixture('one_level/huge', 'one_level/huge')
       right.merge!({ g: Set[1, 2] })
 
@@ -55,7 +55,7 @@ describe HashDeepDiff::Comparison do
       assert_equal([{}, { g: { left: 'ggg', right: Set[1, 2] } }, {}], diff)
     end
 
-    it 'finds difference for one level deep hash with unsorted arrays' do
+    it 'finds difference for hash with unsorted arrays' do
       left, right = load_fixture('one_level/big', 'one_level/big')
       left.merge!({ c: [1, 2, 3] })
       right.merge!({ c: [1, 3, 2] })
@@ -65,7 +65,7 @@ describe HashDeepDiff::Comparison do
       assert_equal([{}, { c: { left: [1, 2, 3], right: [1, 3, 2] } }, {}], diff)
     end
 
-    it 'finds difference for one level deep hash with converted values' do
+    it 'finds difference for hash with converted values' do
       left, right = load_fixture('one_level/big', 'one_level/big')
       left.merge!({ c: [1, 2, 3] })
       right.merge!({ c: [1, 3, 2] })
@@ -74,8 +74,10 @@ describe HashDeepDiff::Comparison do
 
       assert_equal([{}, {}, {}], diff)
     end
+  end
 
-    it 'finds difference for two level deep hash with string values' do
+  describe '#diff (for two level deep hashes)' do
+    it 'finds difference for hash with string values' do
       left, right = load_fixture('two_level/big', 'two_level/big')
       right.merge!({ b: { c: 'd' } })
 
@@ -84,7 +86,7 @@ describe HashDeepDiff::Comparison do
       assert_equal([{}, { b: [{}, { c: { left: 'c', right: 'd' } }, {}] }, {}], diff)
     end
 
-    it 'finds difference for two level deep hash with numeric values' do
+    it 'finds difference for hash with numeric values' do
       left, right = load_fixture('two_level/big', 'two_level/big')
       right.merge!({ b: { c: 'd', e: 3 } })
 
@@ -92,8 +94,10 @@ describe HashDeepDiff::Comparison do
 
       assert_equal([{}, { b: [{}, { c: { left: 'c', right: 'd' } }, { e: 3 }] }, {}], diff)
     end
+  end
 
-    it 'finds difference for three level deep hash with numeric values' do
+  describe '#diff' do
+    it 'finds difference for hash with numeric values' do
       left, right = load_fixture('n_level/big', 'n_level/huge')
       right.merge!({ f: { g: { h: 'j' } } })
 
@@ -128,15 +132,27 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('one_level/big', 'one_level/big')
       left.merge!({ c: [1, 2, 3] })
       right.merge!({ c: [1, 3, 2] })
-
-      report = HashDeepDiff::Comparison.new(left, right).report
-
-      expected = <<~Q
+      diff = <<~Q
         -left[c] = [1, 2, 3]
         +right[c] = [1, 3, 2]
       Q
 
-      assert_equal(expected, report)
+      report = HashDeepDiff::Comparison.new(left, right).report
+
+      assert_equal(diff, report)
+    end
+  end
+
+  describe '#report (for two level deep hashes) ' do
+    focus;
+    it 'lists elements not found on the right' do
+      left, right = load_fixture('two_level/big', 'two_level/big')
+      right.delete(:b)
+      diff = "+left[b][c] = c"
+
+      report = HashDeepDiff::Comparison.new(left, right).report
+
+      assert_equal(diff, report)
     end
   end
 end
