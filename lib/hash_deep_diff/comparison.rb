@@ -20,8 +20,7 @@ module HashDeepDiff
 
       lines = extra.each_with_object([]) do |(key, value), memo|
         if value.instance_of?(Hash)
-          # [:b, {:c=>"c"}]
-          simple_report(memo, [key], value)
+          extra_report(memo, [key], value)
         else
           memo << "+left[#{key}] = #{value}"
         end
@@ -50,10 +49,10 @@ module HashDeepDiff
       @right = right.to_hash
     end
 
-    def simple_report(memo, keys, value)
+    def extra_report(memo, keys, value)
       if value.instance_of?(Hash)
         value.keys.each do |key|
-          simple_report(memo, keys + [key], value[key])
+          extra_report(memo, keys + [key], value[key])
         end
       else
         path = keys.map { |key| "[#{key}]" }.join

@@ -83,7 +83,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
 
-      assert_equal([{}, { b: [{}, { c: { left: 'c', right: 'd' } }, {}] }, {}], diff)
+      assert_equal([{}, {:b=>[{:d=>"d"}, {:c=>{:left=>"c", :right=>"d"}}, {}]}, {}], diff)
     end
 
     it 'finds difference for hash with numeric values' do
@@ -92,7 +92,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
 
-      assert_equal([{}, { b: [{}, { c: { left: 'c', right: 'd' } }, { e: 3 }] }, {}], diff)
+      assert_equal([{}, {:b=>[{:d=>"d"}, {:c=>{:left=>"c", :right=>"d"}}, {:e=>3}]}, {}], diff)
     end
   end
 
@@ -144,13 +144,29 @@ describe HashDeepDiff::Comparison do
   end
 
   describe '#report (for two level deep hashes) ' do
-    focus;
-    it 'lists elements not found on the right' do
+    it 'lists elements not found on the right for simple hashes' do
       left, right = load_fixture('two_level/big', 'two_level/big')
       right.delete(:b)
-      diff = "+left[b][c] = c"
+      diff = <<~Q
+        +left[b][c] = c
+        +left[b][d] = d
+      Q
 
-      report = HashDeepDiff::Comparison.new(left, right).report
+      report = HashDeepDiff::Comparison.new(left, right).report + "\n"
+
+      assert_equal(diff, report)
+    end
+
+    it 'lists elements not found on the right for complex hashes' do
+      left, right = load_fixture('two_level/huge', 'two_level/huge')
+      right.delete(:b)
+      diff = <<~Q
+        +left[b][c] = c
+        +left[b][d] = d
+        +left[b][e] = [1, 2, 3]
+      Q
+
+      report = HashDeepDiff::Comparison.new(left, right).report + "\n"
 
       assert_equal(diff, report)
     end
