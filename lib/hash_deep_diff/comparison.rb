@@ -19,7 +19,12 @@ module HashDeepDiff
       extra, delta, missing = diff(&block)
 
       lines = extra.each_with_object([]) do |(key, value), memo|
-        memo << "+left[#{key}] = #{value}"
+        if value.instance_of?(Hash)
+          # [:b, {:c=>"c"}]
+          simple_report(memo, [key], value)
+        else
+          memo << "+left[#{key}] = #{value}"
+        end
       end
 
       lines += missing.each_with_object([]) do |(key, value), memo|
@@ -37,11 +42,23 @@ module HashDeepDiff
       return lines.join("\n")
     end
 
+
     private
 
     def initialize(left, right)
       @left = left.to_hash
       @right = right.to_hash
+    end
+
+    def simple_report(memo, keys, value)
+      if value.instance_of?(Hash)
+        value.keys.each do |key|
+          simple_report(memo, keys + [key], value[key])
+        end
+      else
+        path = keys.map { |key| "[#{key}]" }.join
+        memo << "+left#{path} = #{value}"
+      end
     end
 
     def deep_delta(&block)
