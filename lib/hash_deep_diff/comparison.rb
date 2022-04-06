@@ -8,8 +8,8 @@ module HashDeepDiff
 
     def diff(&block)
       return [Delta::Left.new, {}, Delta::Right.new] if left == right # this is order-sensitive comparison
-      return [left, {}, Delta::Right.new] if right.empty?
-      return [Delta::Left.new, {}, right] if left.empty?
+      return [Delta::Left.new(delta: left), {}, Delta::Right.new] if right.empty?
+      return [Delta::Left.new, {}, Delta::Right.new(delta: right)] if left.empty?
       return first_level_delta(&block) if one_level_deep?
 
       return [left_delta, deep_delta(&block), right_delta]
@@ -19,7 +19,7 @@ module HashDeepDiff
       extra, delta, missing = diff(&block)
 
       lines = extra.each_with_object([]) do |(key, value), memo|
-        if value.instance_of?(Hash)
+        if value.respond_to?(:to_hash)
           extra_report(memo, [key], value)
         else
           memo << "+left[#{key}] = #{value}"
@@ -27,7 +27,7 @@ module HashDeepDiff
       end
 
       lines += missing.each_with_object([]) do |(key, value), memo|
-        if value.instance_of?(Hash)
+        if value.respond_to?(:to_hash)
           missing_report(memo, [key], value)
         else
           memo << "-left[#{key}] = #{value}"
@@ -58,7 +58,7 @@ module HashDeepDiff
     end
 
     def extra_report(memo, keys, value)
-      if value.instance_of?(Hash)
+      if value.respond_to?(:to_hash)
         value.each_key do |key|
           extra_report(memo, keys + [key], value[key])
         end
@@ -69,7 +69,7 @@ module HashDeepDiff
     end
 
     def missing_report(memo, keys, value)
-      if value.instance_of?(Hash)
+      if value.respond_to?(:to_hash)
         value.each_key do |key|
           missing_report(memo, keys + [key], value[key])
         end
@@ -80,11 +80,11 @@ module HashDeepDiff
     end
 
     def delta_report(memo, keys, value)
-      if value.instance_of?(Hash) && value.keys != %i[left right]
+      if value.respond_to?(:to_hash) && value.keys != %i[left right]
         value.each_key do |key|
           delta_report(memo, keys + [key], value[key])
         end
-      elsif value.instance_of?(Array) && value.size == 3 && value.all? { |el| el.instance_of?(Hash) }
+      elsif value.instance_of?(Array) && value.size == 3 && value.all? { |el| el.respond_to?(:to_hash) }
         # [{}, {}, {:i=>:i}]
         extra_report(memo, keys, value[0]) unless value[0].empty?
         delta_report(memo, keys, value[1]) unless value[1].empty?
@@ -103,7 +103,7 @@ module HashDeepDiff
       result = delta(&block)
 
       result.keys.each_with_object({}) do |key, memo|
-        memo[key] = if left[key].instance_of?(Hash) && right[key].instance_of?(Hash)
+        memo[key] = if left[key].respond_to?(:to_hash) && right[key].respond_to?(:to_hash)
                       self.class.new(left[key], right[key]).diff
                     else
                       result[key]
@@ -113,7 +113,7 @@ module HashDeepDiff
 
     def first_level_delta(&block)
       [
-        left_delta,
+        Delta::Left.new(delta: left_delta),
         delta(&block),
         right_delta
       ]
