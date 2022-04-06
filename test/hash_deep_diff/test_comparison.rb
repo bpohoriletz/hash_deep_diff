@@ -104,7 +104,7 @@ describe HashDeepDiff::Comparison do
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
       assert_equal(
-        [{:g=>[1, 2, 3]}, {:b=>[{}, {:c=>[{}, {:e=>{:left=>[1, 2, 3], :right=>{:f=>{:g=>[1, 2, 3]}, :h=>{:i=>{:j=>{:k=>"k", :l=>"l"}, :m=>"m"}, :n=>"n"}, :o=>"o", :p=>[1, 2, 3]}}}, {:r=>"r", :s=>{:t=>"t", :u=>"u", :v=>{:w=>"w", :x=>{:y=>{:z=>"z"}}}}}]}, {}], :h=>[{:n=>"n"}, {:i=>[{}, {}, {:k=>"k", :l=>"l"}]}, {}]}, {}],
+        [{:g=>[1, 2, 3]}, {:b=>[{}, {:c=>[{}, {:e=>{:left=>[1, 2, 3], :right=>{:f=>{:g=>[1, 2, 3]}, :h=>{:i=>{:j=>{:k=>"k", :l=>"l"}, :m=>"m"}, :n=>"n"}, :o=>"o", :p=>[1, 2, 3]}}}, {:r=>"r", :s=>{:t=>"t", :u=>"u", :v=>{:w=>"w", :x=>{:y=>{:z=>"z"}}}}}]}, {}], :f=>{:left=>"f", :right=>{:g=>{:h=>"j"}}}, :h=>[{:n=>"n"}, {:i=>[{}, {:j=>{:left=>{:k=>"k", :l=>"l"}, :right=>"j"}, :m=>{:left=>"m", :right=>{:n=>"n"}}}, {:k=>"k", :l=>"l"}]}, {}]}, {}],
         diff
       )
     end
@@ -245,12 +245,28 @@ describe HashDeepDiff::Comparison do
       assert_equal(diff, report)
     end
 
-    focus;
     it 'builds git diff like text with discrepancies btween two hashes for deep changes' do
       left, right = load_fixture('n_level/huge', 'n_level/big')
-      diff = ''
+      diff = <<~Q
+        -left[g] = [1, 2, 3]
+        +left[b][c][r] = r
+        +left[b][c][s][t] = t
+        +left[b][c][s][u] = u
+        +left[b][c][s][v][w] = w
+        +left[b][c][s][v][x][y][z] = z
+        -left[b][c][e] = {:f=>{:g=>[1, 2, 3]}, :h=>{:i=>{:j=>{:k=>\"k\", :l=>\"l\"}, :m=>\"m\"}, :n=>\"n\"}, :o=>\"o\", :p=>[1, 2, 3]}
+        +right[b][c][e] = [1, 2, 3]
 
-      report = HashDeepDiff::Comparison.new(left, right).report + "\n"
+        +left[h][i][k] = k
+        +left[h][i][l] = l
+        -left[h][i][j] = j
+        +right[h][i][j] = {:k=>\"k\", :l=>\"l\"}
+
+        -left[h][i][m] = {:n=>\"n\"}
+        +right[h][i][m] = m
+      Q
+
+      report = HashDeepDiff::Comparison.new(left, right).report
 
       assert_equal(diff, report)
     end
