@@ -11,7 +11,7 @@ module HashDeepDiff
       extend Forwardable
       attr_reader :delta
 
-      def_delegators :@delta, :to_s, :inspect, :==, :each_with_object
+      def_delegators :@delta, :to_s, :inspect, :==, :each_with_object, :each_key, :[], :to_a, :empty?
 
       def to_h
         delta
