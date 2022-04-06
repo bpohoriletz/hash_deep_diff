@@ -83,7 +83,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
 
-      assert_equal([{}, {:b=>[{:d=>"d"}, {:c=>{:left=>"c", :right=>"d"}}, {}]}, {}], diff)
+      assert_equal([{}, { b: [{ d: 'd' }, { c: { left: 'c', right: 'd' } }, {}] }, {}], diff)
     end
 
     it 'finds difference for hash with numeric values' do
@@ -92,7 +92,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
 
-      assert_equal([{}, {:b=>[{:d=>"d"}, {:c=>{:left=>"c", :right=>"d"}}, {:e=>3}]}, {}], diff)
+      assert_equal([{}, { b: [{ d: 'd' }, { c: { left: 'c', right: 'd' } }, { e: 3 }] }, {}], diff)
     end
   end
 
@@ -104,8 +104,7 @@ describe HashDeepDiff::Comparison do
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
       assert_equal(
-        [{}, { b: [{}, {}, { d: 'd' }], f: [{}, { g: [{}, { h: { left: 'h', right: 'j' } }, {}] }, {}] },
-         { a: 'a' }],
+        [{:g=>[1, 2, 3]}, {:b=>[{}, {:c=>[{}, {:e=>{:left=>[1, 2, 3], :right=>{:f=>{:g=>[1, 2, 3]}, :h=>{:i=>{:j=>{:k=>"k", :l=>"l"}, :m=>"m"}, :n=>"n"}, :o=>"o", :p=>[1, 2, 3]}}}, {:r=>"r", :s=>{:t=>"t", :u=>"u", :v=>{:w=>"w", :x=>{:y=>{:z=>"z"}}}}}]}, {}], :h=>[{:n=>"n"}, {:i=>[{}, {}, {:k=>"k", :l=>"l"}]}, {}]}, {}],
         diff
       )
     end
@@ -152,7 +151,7 @@ describe HashDeepDiff::Comparison do
         +left[b][d] = d
       Q
 
-      report = HashDeepDiff::Comparison.new(left, right).report + "\n"
+      report = "#{HashDeepDiff::Comparison.new(left, right).report}\n"
 
       assert_equal(diff, report)
     end
@@ -166,7 +165,7 @@ describe HashDeepDiff::Comparison do
         +left[b][e] = [1, 2, 3]
       Q
 
-      report = HashDeepDiff::Comparison.new(left, right).report + "\n"
+      report = "#{HashDeepDiff::Comparison.new(left, right).report}\n"
 
       assert_equal(diff, report)
     end
@@ -179,7 +178,7 @@ describe HashDeepDiff::Comparison do
         -left[b][d] = d
       Q
 
-      report = HashDeepDiff::Comparison.new(left, right).report + "\n"
+      report = "#{HashDeepDiff::Comparison.new(left, right).report}\n"
 
       assert_equal(diff, report)
     end
@@ -192,6 +191,64 @@ describe HashDeepDiff::Comparison do
         -left[b][d] = d
         -left[b][e] = [1, 2, 3]
       Q
+
+      report = "#{HashDeepDiff::Comparison.new(left, right).report}\n"
+
+      assert_equal(diff, report)
+    end
+
+    it 'reports difference for simple hashes' do
+      left, right = load_fixture('two_level/big', 'two_level/big')
+      right[:b][:c] = :d
+      diff = <<~Q
+        -left[b][c] = c
+        +right[b][c] = d
+      Q
+
+      report = HashDeepDiff::Comparison.new(left, right).report
+
+      assert_equal(diff, report)
+    end
+  end
+
+  describe '#report' do
+    it 'builds git diff like text with discrepancies btween two hashes for deep additions' do
+      left, right = load_fixture('n_level/big', 'n_level/big')
+      right[:b][:c][:i] = :i
+      diff = '-left[b][c][i] = i'
+
+      report = HashDeepDiff::Comparison.new(left, right).report
+
+      assert_equal(diff, report)
+    end
+
+    it 'builds git diff like text with discrepancies btween two hashes for deep deletions' do
+      left, right = load_fixture('n_level/big', 'n_level/big')
+      left[:h][:i][:j].delete(:k)
+      diff = '-left[h][i][j][k] = k'
+
+      report = HashDeepDiff::Comparison.new(left, right).report
+
+      assert_equal(diff, report)
+    end
+
+    it 'builds git diff like text with discrepancies btween two hashes for deep changes' do
+      left, right = load_fixture('n_level/big', 'n_level/big')
+      left[:h][:i][:j][:k] = 'm'
+      diff = <<~Q
+        -left[h][i][j][k] = m
+        +right[h][i][j][k] = k
+      Q
+
+      report = HashDeepDiff::Comparison.new(left, right).report
+
+      assert_equal(diff, report)
+    end
+
+    focus;
+    it 'builds git diff like text with discrepancies btween two hashes for deep changes' do
+      left, right = load_fixture('n_level/huge', 'n_level/big')
+      diff = ''
 
       report = HashDeepDiff::Comparison.new(left, right).report + "\n"
 
