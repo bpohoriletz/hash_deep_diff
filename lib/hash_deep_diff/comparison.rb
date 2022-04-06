@@ -7,9 +7,9 @@ module HashDeepDiff
     attr_reader :left, :right
 
     def diff(&block)
-      return [{}, {}, {}] if left == right # this is order-sensitive comparison
+      return [Delta::Left.new, {}, {}] if left == right # this is order-sensitive comparison
       return [left, {}, {}] if right.empty?
-      return [{}, {}, right] if left.empty?
+      return [Delta::Left.new, {}, right] if left.empty?
       return first_level_delta(&block) if one_level_deep?
 
       return [left_delta, deep_delta(&block), right_delta]
@@ -103,11 +103,11 @@ module HashDeepDiff
       result = delta(&block)
 
       result.keys.each_with_object({}) do |key, memo|
-        if left[key].instance_of?(Hash) && right[key].instance_of?(Hash)
-          memo[key] = self.class.new(left[key], right[key]).diff
-        else
-          memo[key] = result[key]
-        end
+        memo[key] = if left[key].instance_of?(Hash) && right[key].instance_of?(Hash)
+                      self.class.new(left[key], right[key]).diff
+                    else
+                      result[key]
+                    end
       end
     end
 
