@@ -17,7 +17,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal([left, {}, {}], diff)
+      assert_equal([left, {}, {}], diff.map(&:to_h))
     end
 
     it 'finds right if left is empty' do

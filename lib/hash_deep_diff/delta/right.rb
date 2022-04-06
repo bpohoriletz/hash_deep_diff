@@ -4,14 +4,14 @@ require 'forwardable'
 
 module HashDeepDiff
   module Delta
-    # Representation of the pure left diff
+    # Representation of the pure right diff
     # i.e element that are missing in the hash on the right of the comparison
-    # for example left diff of { a: a } and {} is { a: a }
-    class Left
+    # for example right diff of {} and { a: a } is { a: a }
+    class Right
       extend Forwardable
       attr_reader :delta
 
-      def_delegators :@delta, :to_s, :==, :each_with_object
+      def_delegators :@delta, :to_s, :inspect, :==, :each_with_object
 
       def to_h
         delta

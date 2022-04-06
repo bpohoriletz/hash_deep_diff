@@ -7,8 +7,8 @@ module HashDeepDiff
     attr_reader :left, :right
 
     def diff(&block)
-      return [Delta::Left.new, {}, {}] if left == right # this is order-sensitive comparison
-      return [left, {}, {}] if right.empty?
+      return [Delta::Left.new, {}, Delta::Right.new] if left == right # this is order-sensitive comparison
+      return [left, {}, Delta::Right.new] if right.empty?
       return [Delta::Left.new, {}, right] if left.empty?
       return first_level_delta(&block) if one_level_deep?
 
