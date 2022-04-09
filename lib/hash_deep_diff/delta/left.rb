@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'forwardable'
+require_relative 'acts_as_hash'
 
 module HashDeepDiff
   module Delta
@@ -8,18 +8,8 @@ module HashDeepDiff
     # i.e element that are missing in the hash on the right of the comparison
     # for example left diff of { a: a } and {} is { a: a }
     class Left
-      extend Forwardable
+      include Delta::ActsAsHash
       attr_reader :delta
-
-      def_delegators :@delta, :to_s, :==, :each_with_object, :each_key, :[], :to_a, :empty?
-
-      def to_h
-        delta
-      end
-
-      def to_hash
-        delta
-      end
 
       private
 
