@@ -144,7 +144,7 @@ describe HashDeepDiff::Comparison do
 
       report = HashDeepDiff::Comparison.new(left, right).report
 
-      assert_equal(diff, report)
+      assert_equal(diff.strip, report)
     end
   end
 
