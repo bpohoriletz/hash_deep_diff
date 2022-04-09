@@ -105,7 +105,12 @@ describe HashDeepDiff::Comparison do
 
       assert_equal(
         [{ g: [1, 2, 3] },
-         { b: [{}, { c: [{}, { e: { left: [1, 2, 3], right: { f: { g: [1, 2, 3] }, h: { i: { j: { k: 'k', l: 'l' }, m: 'm' }, n: 'n' }, o: 'o', p: [1, 2, 3] } } }, { r: 'r', s: { t: 't', u: 'u', v: { w: 'w', x: { y: { z: 'z' } } } } }] }, {}], f: { left: 'f', right: { g: { h: 'j' } } }, h: [{ n: 'n' }, { i: [{}, { j: { left: { k: 'k', l: 'l' }, right: 'j' }, m: { left: 'm', right: { n: 'n' } } }, { k: 'k', l: 'l' }] }, {}] }, {}],
+         { b: [{}, { c: [{}, { e: { left: [1, 2, 3], right: { f: { g: [1, 2, 3] }, h: { i: { j:
+         { k: 'k', l: 'l' }, m: 'm' }, n: 'n' }, o: 'o', p: [1, 2, 3] } } }, { r: 'r', s:
+         { t: 't', u: 'u', v: { w: 'w', x: { y: { z: 'z' } } } } }] }, {}], f: { left: 'f', right:
+         { g: { h: 'j' } } }, h: [{ n: 'n' }, { i: [{}, { j: { left:
+         { k: 'k', l: 'l' }, right: 'j' }, m: { left: 'm', right:
+         { n: 'n' } } }, { k: 'k', l: 'l' }] }, {}] }, {}],
         diff
       )
     end
