@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require_relative 'delta/left'
+require_relative 'delta/inner'
+require_relative 'delta/right'
+
 # :nodoc:
 module HashDeepDiff
   # :nodoc:
@@ -7,9 +11,9 @@ module HashDeepDiff
     attr_reader :left, :right
 
     def diff(&block)
-      return [Delta::Left.new, {}, Delta::Right.new] if left == right # this is order-sensitive comparison
-      return [Delta::Left.new(delta: left), {}, Delta::Right.new] if right.empty?
-      return [Delta::Left.new, {}, Delta::Right.new(delta: right)] if left.empty?
+      return [Delta::Left.new, Delta::Inner.new, Delta::Right.new] if left == right # this is order-sensitive comparison
+      return [Delta::Left.new(delta: left), Delta::Inner.new, Delta::Right.new] if right.empty?
+      return [Delta::Left.new, Delta::Inner.new, Delta::Right.new(delta: right)] if left.empty?
       return first_level_delta(&block) if one_level_deep?
 
       return [left_delta, deep_delta(&block), right_delta]
