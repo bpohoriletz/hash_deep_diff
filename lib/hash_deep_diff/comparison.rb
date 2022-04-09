@@ -113,8 +113,8 @@ module HashDeepDiff
     def first_level_delta(&block)
       [
         Delta::Left.new(delta: left_delta),
-        delta(&block),
-        right_delta
+        Delta::Inner.new(delta: delta(&block)),
+        Delta::Right.new(delta: right_delta),
       ]
     end
 
