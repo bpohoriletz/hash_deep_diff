@@ -9,12 +9,14 @@ module HashDeepDiff
   # :nodoc:
   class Comparison
     attr_reader :left, :right
+    EMPTY_DELTA = ->() { [Delta::Left.new, Delta::Inner.new, Delta::Right.new] }.freeze
+    LEFT_DELTA = ->(delta) { [Delta::Left.new(delta: delta), Delta::Inner.new, Delta::Right.new] }.freeze
+    RIGHT_DELTA = ->(delta) { [Delta::Left.new, Delta::Inner.new, Delta::Right.new(delta: delta)] }.freeze
 
     def diff(&block)
-      return [Delta::Left.new, Delta::Inner.new, Delta::Right.new] if left == right # this is order-sensitive comparison
-      return [Delta::Left.new(delta: left), Delta::Inner.new, Delta::Right.new] if right.empty?
-      return [Delta::Left.new, Delta::Inner.new, Delta::Right.new(delta: right)] if left.empty?
-      return first_level_delta(&block) if one_level_deep?
+      return EMPTY_DELTA.call if left == right # this is order-sensitive comparison
+      return LEFT_DELTA.call(left) if right.empty?
+      return RIGHT_DELTA.call(right) if left.empty?
 
       return [left_delta, deep_delta(&block), right_delta]
     end
@@ -110,14 +112,6 @@ module HashDeepDiff
       end
     end
 
-    def first_level_delta(&block)
-      [
-        Delta::Left.new(delta: left_delta),
-        Delta::Inner.new(delta: delta(&block)),
-        Delta::Right.new(delta: right_delta),
-      ]
-    end
-
     def right_delta
       right_diff_keys.each_with_object({}) do |key, memo|
         memo[key] = right[key]
@@ -144,11 +138,6 @@ module HashDeepDiff
       left_diff_keys.each_with_object({}) do |key, memo|
         memo[key] = left[key]
       end
-    end
-
-    def one_level_deep?
-      left.values.none? { |value| value.respond_to?(:to_hash) } ||
-        right.values.none? { |value| value.respond_to?(:to_hash) }
     end
 
     def common_keys
