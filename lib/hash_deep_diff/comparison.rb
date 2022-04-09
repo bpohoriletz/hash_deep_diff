@@ -40,14 +40,9 @@ module HashDeepDiff
 
       lines += delta.each_with_object([]) do |(key, value), memo|
         if value.instance_of?(Array)
-          # value = [{}, {}, {}]
           delta_report(memo, [key], value[1])
         else
-          line = <<~Q
-            -left[#{key}] = #{value[:left]}
-            +right[#{key}] = #{value[:right]}
-          Q
-          memo << line
+          memo << Delta::Inner.new(delta: Hash[key, value])
         end
       end
 
