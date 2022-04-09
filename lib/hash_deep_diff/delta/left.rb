@@ -11,6 +11,14 @@ module HashDeepDiff
       include Delta::ActsAsHash
       attr_reader :delta
 
+      def to_s
+        to_str
+      end
+
+      def to_str
+        "+left[#{delta.keys.first}] = #{delta.values.first}"
+      end
+
       private
 
       def initialize(delta: {})

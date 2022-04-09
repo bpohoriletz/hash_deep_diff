@@ -26,7 +26,7 @@ module HashDeepDiff
         if value.respond_to?(:to_hash)
           extra_report(memo, [key], value)
         else
-          memo << "+left[#{key}] = #{value}"
+          memo << Delta::Left.new(delta: Hash[key, value])
         end
       end
 
