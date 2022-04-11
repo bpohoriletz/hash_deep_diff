@@ -10,14 +10,8 @@ module HashDeepDiff
   class Comparison
     attr_reader :left, :right
 
-    EMPTY_DELTA = -> { [Delta::Left.new, Delta::Inner.new, Delta::Right.new] }.freeze
-    LEFT_DELTA = ->(delta) { [Delta::Left.new(delta: delta), Delta::Inner.new, Delta::Right.new] }.freeze
-    RIGHT_DELTA = ->(delta) { [Delta::Left.new, Delta::Inner.new, Delta::Right.new(delta: delta)] }.freeze
-
     def diff(&block)
-      return EMPTY_DELTA.call if left == right # this is order-sensitive comparison
-      return LEFT_DELTA.call(left) if right.empty?
-      return RIGHT_DELTA.call(right) if left.empty?
+      return [{}, {}, {}] if left == right # this is order-sensitive comparison
 
       return [left_delta, deep_delta(&block), right_delta]
     end
@@ -29,7 +23,7 @@ module HashDeepDiff
         if value.respond_to?(:to_hash)
           extra_report(memo, [key], value)
         else
-          memo << Delta::Left.new(delta: { key => value })
+          memo << Delta::Left.new(path: key, value: value)
         end
       end
 
@@ -37,7 +31,7 @@ module HashDeepDiff
         if value.respond_to?(:to_hash)
           missing_report(memo, [key], value)
         else
-          memo << Delta::Right.new(delta: { key => value })
+          memo << Delta::Right.new(path: key, value: value)
         end
       end
 
@@ -45,7 +39,7 @@ module HashDeepDiff
         if value.instance_of?(Array)
           delta_report(memo, [key], value[1])
         else
-          memo << Delta::Inner.new(delta: { key => value })
+          memo << Delta::Inner.new(path: key, value: value)
         end
       end
 
@@ -65,8 +59,7 @@ module HashDeepDiff
           extra_report(memo, keys + [key], value[key])
         end
       else
-        path = keys.map { |key| "[#{key}]" }.join
-        memo << "+left#{path} = #{value}"
+        memo << Delta::Left.new(path: keys, value: value)
       end
     end
 
@@ -76,8 +69,7 @@ module HashDeepDiff
           missing_report(memo, keys + [key], value[key])
         end
       else
-        path = keys.map { |key| "[#{key}]" }.join
-        memo << "-left#{path} = #{value}"
+        memo << Delta::Right.new(path: keys, value: value)
       end
     end
 
@@ -92,12 +84,7 @@ module HashDeepDiff
         delta_report(memo, keys, value[1]) unless value[1].empty?
         missing_report(memo, keys, value[2]) unless value[2].empty?
       else
-        path = keys.map { |key| "[#{key}]" }.join
-        line = <<~Q
-          -left#{path} = #{value[:left]}
-          +right#{path} = #{value[:right]}
-        Q
-        memo << line
+        memo << Delta::Inner.new(path: keys, value: value)
       end
     end
 

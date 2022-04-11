@@ -11,7 +11,7 @@ module HashDeepDiff
       include Delta::ActsAsDelta
 
       def to_str
-        "+left#{path} = #{delta.values.first}"
+        "+left#{path} = #{@delta.values.first}"
       end
     end
   end

@@ -12,24 +12,23 @@ module HashDeepDiff
         base.extend(Forwardable)
         base.def_delegators :@delta, :inspect, :==, :each_with_object, :each_key, :[],
                             :to_a, :empty?, :keys
-        base.attr_reader :delta, :prefix
       end
 
       # Assumes that the class will include method delta that will return a representation of an
       # instance of a class as a Hash
       module InstanceMethods
         def path
-          full_path = prefix + [delta.keys.first]
+          full_path = @prefix + [@delta.keys.first]
 
           full_path.map { |key| "[#{key}]" }.join
         end
 
         def to_h
-          delta
+          @delta
         end
 
         def to_hash
-          delta
+          @delta
         end
 
         def to_s
@@ -43,9 +42,15 @@ module HashDeepDiff
 
       # Override #initialize method
       module Initialize
-        def initialize(delta: {}, prefix: [])
-          @delta = delta.to_hash
-          @prefix = prefix
+        def initialize(path:, value:)
+          # TOFIX this may prohibit usage of hashes with Array keys
+          if path.respond_to?(:to_ary)
+            @delta = { path[-1] => value }
+            @prefix = path[0..-2]
+          else
+            @delta = { path => value }
+            @prefix = []
+          end
         end
       end
     end
