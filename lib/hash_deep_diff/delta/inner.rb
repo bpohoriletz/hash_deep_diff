@@ -12,8 +12,8 @@ module HashDeepDiff
 
       def to_str
         lines = <<~Q
-          -left#{path} = #{@delta.values.first[:left]}
-          +right#{path} = #{@delta.values.first[:right]}
+          -left#{diff_prefix} = #{@delta.values.first[:left]}
+          +right#{diff_prefix} = #{@delta.values.first[:right]}
         Q
         lines.strip
       end
