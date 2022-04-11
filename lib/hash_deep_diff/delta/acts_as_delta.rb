@@ -5,7 +5,7 @@ require 'forwardable'
 module HashDeepDiff
   module Delta
     # This module includes behavior that is needed to use deltas instead of Hash inside this gem
-    module ActsAsHash
+    module ActsAsDelta
       def self.included(base)
         base.extend(Forwardable)
         base.def_delegators :@delta, :to_s, :inspect, :==, :each_with_object, :each_key, :[],
