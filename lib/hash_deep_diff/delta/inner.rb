@@ -11,11 +11,33 @@ module HashDeepDiff
       include Delta::ActsAsDelta
 
       def to_str
-        lines = <<~Q
-          -left#{diff_prefix} = #{@delta.values.first[:left]}
-          +right#{diff_prefix} = #{@delta.values.first[:right]}
-        Q
-        lines.strip
+        if @delta.values.first.respond_to?(:to_hash)
+          if @delta.values.first.keys == %i[left right]
+            if @delta.values.first[:left].respond_to?(:to_hash) && @delta.values.first[:right].respond_to?(:to_hash)
+              HashDeepDiff::Comparison.new(
+                @delta.values.first[:left],
+                @delta.values.first[:right],
+                path
+              ).report
+            else
+              lines = <<~Q
+                -left#{diff_prefix} = #{@delta.values.first[:left]}
+                +right#{diff_prefix} = #{@delta.values.first[:right]}
+              Q
+              lines.strip
+            end
+          else
+            @delta.values.first.keys.map do |key|
+              self.class.new(path: path + [key], value: @delta.values.first[key])
+            end.join("\n").strip
+          end
+        else
+          lines = <<~Q
+            -left#{diff_prefix} = #{@delta.values.first[:left]}
+            +right#{diff_prefix} = #{@delta.values.first[:right]}
+          Q
+          lines.strip
+        end
       end
     end
   end
