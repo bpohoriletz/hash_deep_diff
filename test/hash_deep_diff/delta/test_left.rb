@@ -12,7 +12,7 @@ describe HashDeepDiff::Delta::Left do
   end
 
   it 'appends prefix to a report' do
-    subject = HashDeepDiff::Delta::Left.new(path: [:b, :a], value: data[:a])
+    subject = HashDeepDiff::Delta::Left.new(path: %i[b a], value: data[:a])
 
     assert_equal('+left[b][a] = b', subject.to_s)
   end
