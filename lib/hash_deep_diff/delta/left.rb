@@ -9,20 +9,27 @@ module HashDeepDiff
     # for example left diff of { a: a } and {} is { a: a }
     class Left
       include Delta::ActsAsHash
-      attr_reader :delta
+      attr_reader :delta, :prefix
 
       def to_s
         to_str
       end
 
       def to_str
-        "+left[#{delta.keys.first}] = #{delta.values.first}"
+        "+left#{path} = #{delta.values.first}"
       end
 
       private
 
-      def initialize(delta: {})
+      def initialize(delta: {}, prefix: [])
         @delta = delta.to_hash
+        @prefix = prefix
+      end
+
+      def path
+        full_path = prefix + [delta.keys.first]
+
+        full_path.map { |key| "[#{key}]" }.join
       end
     end
   end
