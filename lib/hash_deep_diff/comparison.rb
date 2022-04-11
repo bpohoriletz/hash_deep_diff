@@ -70,9 +70,7 @@ module HashDeepDiff
     end
 
     def right_delta
-      right_diff_keys.each_with_object([]) do |key, memo|
-        memo << Delta::Right.new(path: path + [key], value: right[key])
-      end
+      right_diff_keys.map { |key| Delta::Right.new(path: path + [key], value: right[key]) }
     end
 
     def delta(&block)
@@ -89,9 +87,7 @@ module HashDeepDiff
     end
 
     def left_delta
-      left_diff_keys.each_with_object([]) do |key, memo|
-        memo << Delta::Left.new(path: path + [key], value: left[key])
-      end
+      left_diff_keys.map { |key| Delta::Left.new(path: path + [key], value: left[key]) }
     end
 
     def common_keys
