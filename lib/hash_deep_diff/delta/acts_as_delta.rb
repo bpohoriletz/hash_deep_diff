@@ -10,17 +10,21 @@ module HashDeepDiff
         base.prepend(Initialize)
         base.include(InstanceMethods)
         base.extend(Forwardable)
-        base.def_delegators :@delta, :inspect, :==, :each_with_object, :each_key, :[],
+        base.def_delegators :@delta, :==, :each_with_object, :each_key, :[],
                             :to_a, :empty?, :keys
       end
 
       # Assumes that the class will include method delta that will return a representation of an
       # instance of a class as a Hash
       module InstanceMethods
-        def path
-          full_path = @prefix + [@delta.keys.first]
+        # TOFIX poor naming
+        def diff_prefix
+          path.map { |key| "[#{key}]" }.join
+        end
 
-          full_path.map { |key| "[#{key}]" }.join
+        # TOFIX poor naming
+        def path
+          @prefix + [@delta.keys.first]
         end
 
         def to_h
