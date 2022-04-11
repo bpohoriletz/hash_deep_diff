@@ -9,20 +9,9 @@ module HashDeepDiff
     # for example right diff of {} and { a: a } is { a: a }
     class Right
       include Delta::ActsAsDelta
-      attr_reader :delta
-
-      def to_s
-        to_str
-      end
 
       def to_str
         "-left[#{delta.keys.first}] = #{delta.values.first}"
-      end
-
-      private
-
-      def initialize(delta: {})
-        @delta = delta.to_hash
       end
     end
   end
