@@ -11,9 +11,7 @@ module HashDeepDiff
     attr_reader :left, :right
 
     def diff(&block)
-      return [{}, {}, {}] if left == right # this is order-sensitive comparison
-
-      return [left_delta, deep_delta(&block), right_delta]
+      [left_delta, deep_delta(&block), right_delta]
     end
 
     def report(&block)
@@ -55,9 +53,7 @@ module HashDeepDiff
 
     def extra_report(memo, keys, value)
       if value.respond_to?(:to_hash)
-        value.each_key do |key|
-          extra_report(memo, keys + [key], value[key])
-        end
+        value.each_key { |key| extra_report(memo, keys + [key], value[key]) }
       else
         memo << Delta::Left.new(path: keys, value: value)
       end
@@ -65,9 +61,7 @@ module HashDeepDiff
 
     def missing_report(memo, keys, value)
       if value.respond_to?(:to_hash)
-        value.each_key do |key|
-          missing_report(memo, keys + [key], value[key])
-        end
+        value.each_key { |key| missing_report(memo, keys + [key], value[key]) }
       else
         memo << Delta::Right.new(path: keys, value: value)
       end
@@ -75,9 +69,7 @@ module HashDeepDiff
 
     def delta_report(memo, keys, value)
       if value.respond_to?(:to_hash) && value.keys != %i[left right]
-        value.each_key do |key|
-          delta_report(memo, keys + [key], value[key])
-        end
+        value.each_key { |key| delta_report(memo, keys + [key], value[key]) }
       elsif value.instance_of?(Array) && value.size == 3 && value.all? { |el| el.respond_to?(:to_hash) }
         # [{}, {}, {:i=>:i}]
         extra_report(memo, keys, value[0]) unless value[0].empty?
