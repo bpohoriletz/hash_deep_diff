@@ -213,7 +213,7 @@ describe HashDeepDiff::Comparison do
 
       report = HashDeepDiff::Comparison.new(left, right).report
 
-      assert_equal(diff, report)
+      assert_equal(diff.strip, report)
     end
   end
 
@@ -248,7 +248,7 @@ describe HashDeepDiff::Comparison do
 
       report = HashDeepDiff::Comparison.new(left, right).report
 
-      assert_equal(diff, report)
+      assert_equal(diff.strip, report)
     end
 
     it 'builds git diff like text with discrepancies btween two hashes for deep changes' do
@@ -262,19 +262,17 @@ describe HashDeepDiff::Comparison do
         +left[b][c][s][v][x][y][z] = z
         -left[b][c][e] = {:f=>{:g=>[1, 2, 3]}, :h=>{:i=>{:j=>{:k=>\"k\", :l=>\"l\"}, :m=>\"m\"}, :n=>\"n\"}, :o=>\"o\", :p=>[1, 2, 3]}
         +right[b][c][e] = [1, 2, 3]
-
         +left[h][i][k] = k
         +left[h][i][l] = l
         -left[h][i][j] = j
         +right[h][i][j] = {:k=>\"k\", :l=>\"l\"}
-
         -left[h][i][m] = {:n=>\"n\"}
         +right[h][i][m] = m
       Q
 
       report = HashDeepDiff::Comparison.new(left, right).report
 
-      assert_equal(diff, report)
+      assert_equal(diff.strip, report)
     end
   end
 end
