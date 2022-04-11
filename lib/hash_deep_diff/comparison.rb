@@ -9,7 +9,8 @@ module HashDeepDiff
   # :nodoc:
   class Comparison
     attr_reader :left, :right
-    EMPTY_DELTA = ->() { [Delta::Left.new, Delta::Inner.new, Delta::Right.new] }.freeze
+
+    EMPTY_DELTA = -> { [Delta::Left.new, Delta::Inner.new, Delta::Right.new] }.freeze
     LEFT_DELTA = ->(delta) { [Delta::Left.new(delta: delta), Delta::Inner.new, Delta::Right.new] }.freeze
     RIGHT_DELTA = ->(delta) { [Delta::Left.new, Delta::Inner.new, Delta::Right.new(delta: delta)] }.freeze
 
@@ -28,7 +29,7 @@ module HashDeepDiff
         if value.respond_to?(:to_hash)
           extra_report(memo, [key], value)
         else
-          memo << Delta::Left.new(delta: Hash[key, value])
+          memo << Delta::Left.new(delta: { key => value })
         end
       end
 
@@ -36,7 +37,7 @@ module HashDeepDiff
         if value.respond_to?(:to_hash)
           missing_report(memo, [key], value)
         else
-          memo << Delta::Right.new(delta: Hash[key, value])
+          memo << Delta::Right.new(delta: { key => value })
         end
       end
 
@@ -44,7 +45,7 @@ module HashDeepDiff
         if value.instance_of?(Array)
           delta_report(memo, [key], value[1])
         else
-          memo << Delta::Inner.new(delta: Hash[key, value])
+          memo << Delta::Inner.new(delta: { key => value })
         end
       end
 
