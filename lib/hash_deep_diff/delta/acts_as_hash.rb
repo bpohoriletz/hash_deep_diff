@@ -9,7 +9,7 @@ module HashDeepDiff
       def self.included(base)
         base.extend(Forwardable)
         base.def_delegators :@delta, :to_s, :inspect, :==, :each_with_object, :each_key, :[],
-          :to_a, :empty?, :keys
+                            :to_a, :empty?, :keys
 
         base.include(InstanceMethods)
       end
