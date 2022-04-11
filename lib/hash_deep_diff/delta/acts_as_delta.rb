@@ -18,6 +18,12 @@ module HashDeepDiff
       # Assumes that the class will include method delta that will return a representation of an
       # instance of a class as a Hash
       module InstanceMethods
+        def path
+          full_path = prefix + [delta.keys.first]
+
+          full_path.map { |key| "[#{key}]" }.join
+        end
+
         def to_h
           delta
         end

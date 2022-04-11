@@ -13,14 +13,6 @@ module HashDeepDiff
       def to_str
         "+left#{path} = #{delta.values.first}"
       end
-
-      private
-
-      def path
-        full_path = prefix + [delta.keys.first]
-
-        full_path.map { |key| "[#{key}]" }.join
-      end
     end
   end
 end
