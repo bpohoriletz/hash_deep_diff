@@ -26,35 +26,6 @@ module HashDeepDiff
       @path = path.to_ary
     end
 
-    def extra_report(memo, keys, value)
-      if value.respond_to?(:to_hash)
-        value.each_key { |key| extra_report(memo, keys + [key], value[key]) }
-      else
-        memo << Delta::Left.new(path: keys, value: value)
-      end
-    end
-
-    def missing_report(memo, keys, value)
-      if value.respond_to?(:to_hash)
-        value.each_key { |key| missing_report(memo, keys + [key], value[key]) }
-      else
-        memo << Delta::Right.new(path: keys, value: value)
-      end
-    end
-
-    def delta_report(memo, keys, value)
-      if value.respond_to?(:to_hash) && value.keys != %i[left right]
-        value.each_key { |key| delta_report(memo, keys + [key], value[key]) }
-      elsif value.instance_of?(Array) && value.size == 3 && value.all? { |el| el.respond_to?(:to_hash) }
-        # [{}, {}, {:i=>:i}]
-        extra_report(memo, keys, value[0]) unless value[0].empty?
-        delta_report(memo, keys, value[1]) unless value[1].empty?
-        missing_report(memo, keys, value[2]) unless value[2].empty?
-      else
-        memo << Delta::Inner.new(path: keys, value: value)
-      end
-    end
-
     def deep_delta(&block)
       result = delta(&block)
 
