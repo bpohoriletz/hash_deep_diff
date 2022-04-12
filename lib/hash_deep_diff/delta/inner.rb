@@ -13,16 +13,12 @@ module HashDeepDiff
       def to_str
         if @delta.values.first.respond_to?(:to_hash)
           if @delta.values.first.keys == %i[left right]
-            if @delta.values.first[:left].respond_to?(:to_hash) && @delta.values.first[:right].respond_to?(:to_hash)
-              HashDeepDiff::Comparison.new(
-                @delta.values.first[:left],
-                @delta.values.first[:right],
-                path
-              ).report
+            if complex?
+              HashDeepDiff::Comparison.new(left, right, path).report
             else
               lines = <<~Q
-                -left#{diff_prefix} = #{@delta.values.first[:left]}
-                +right#{diff_prefix} = #{@delta.values.first[:right]}
+                -left#{diff_prefix} = #{left}
+                +right#{diff_prefix} = #{right}
               Q
               lines.strip
             end
@@ -33,11 +29,23 @@ module HashDeepDiff
           end
         else
           lines = <<~Q
-            -left#{diff_prefix} = #{@delta.values.first[:left]}
-            +right#{diff_prefix} = #{@delta.values.first[:right]}
+            -left#{diff_prefix} = #{left}
+            +right#{diff_prefix} = #{right}
           Q
           lines.strip
         end
+      end
+
+      def complex?
+        left.respond_to?(:to_hash) && right.respond_to?(:to_hash)
+      end
+
+      def left
+        @delta.values.first[:left]
+      end
+
+      def right
+        @delta.values.first[:right]
       end
     end
   end

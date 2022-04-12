@@ -83,7 +83,7 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/big', 'two_level/big')
       right.merge!({ b: { c: 'd' } })
 
-      diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
+      diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.respond_to?(:to_ary) ? value.sort : value }
 
       assert_equal([{ d: 'd' }, { c: { left: 'c', right: 'd' } }], diff.map(&:to_hash))
       assert_equal([%i[b d], %i[b c]], diff.map(&:path))
@@ -93,7 +93,7 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/big', 'two_level/big')
       right.merge!({ b: { c: 'd', e: 3 } })
 
-      diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
+      diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.respond_to?(:to_ary) ? value.sort : value }
 
       assert_equal([{ d: 'd' }, { c: { left: 'c', right: 'd' } }, { e: 3 }], diff)
       assert_equal([%i[b d], %i[b c], %i[b e]], diff.map(&:path))
@@ -109,19 +109,23 @@ describe HashDeepDiff::Comparison do
 
       assert_equal(
         [{ g: [1, 2, 3] },
-         { c: { left: { d: 'd', e: [1, 2, 3] },
-                right: { d: 'd',
-                         e: { f: { g: [1, 2, 3] }, h: { i: { j: { k: 'k', l: 'l' }, m: 'm' }, n: 'n' }, o: 'o',
-                              p: [1, 2, 3] },
-                         r: 'r',
-                         s: { t: 't', u: 'u', v: { w: 'w', x: { y: { z: 'z' } } } } } } },
+         { e: { left: [1, 2, 3],
+                right: { f: { g: [1, 2, 3] }, h: { i: { j: { k: 'k', l: 'l' }, m: 'm' }, n: 'n' },
+                         o: 'o', p: [1, 2, 3] } } },
+         { r: 'r' },
+         { s: { t: 't', u: 'u', v: { w: 'w', x: { y: { z: 'z' } } } } },
          { f: { left: 'f', right: { g: { h: 'j' } } } },
          { n: 'n' },
-         { i: { left: { j: { k: 'k', l: 'l' }, m: 'm' },
-                right: { j: 'j', k: 'k', l: 'l', m: { n: 'n' } } } }],
+         { j: { left: { k: 'k', l: 'l' }, right: 'j' } },
+         { m: { left: 'm', right: { n: 'n' } } },
+         { k: 'k' },
+         { l: 'l' }],
         diff
       )
-      assert_equal([[:g], %i[b c], [:f], %i[h n], %i[h i]], diff.map(&:path))
+      assert_equal(
+        [[:g], %i[b c e], %i[b c r], %i[b c s], [:f], %i[h n], %i[h i j], %i[h i m], %i[h i k],
+         %i[h i l]], diff.map(&:path)
+      )
     end
   end
 

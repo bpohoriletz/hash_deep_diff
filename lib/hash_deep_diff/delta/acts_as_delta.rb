@@ -42,6 +42,10 @@ module HashDeepDiff
         def to_str
           raise NoMethodError, "expected #{self.class} to implement #to_str"
         end
+
+        def complex?
+          raise NoMethodError, "expected #{self.class} to implement #complex?"
+        end
       end
 
       # Override #initialize method
