@@ -27,17 +27,17 @@ module HashDeepDiff
     end
 
     def deep_delta(&block)
-      result = delta(&block)
-
-      result.each_with_object([]) do |diff, memo|
-        if left.dig(*diff.path).respond_to?(:to_hash) && right.dig(*diff.path).respond_to?(:to_hash)
-          self.class.new(left.dig(*diff.path), right.dig(*diff.path), path + diff.path).diff.each do |diff|
-            memo << diff
-          end
+      delta(&block).flat_map do |diff|
+        if diff.complex?
+          self.class.new(diff.left, diff.right, diff.path).diff
         else
-          memo << diff
+          diff
         end
       end
+    end
+
+    def left_delta
+      left_diff_keys.map { |key| Delta::Left.new(path: path + [key], value: left[key]) }
     end
 
     def right_delta
@@ -55,10 +55,6 @@ module HashDeepDiff
 
         memo << Delta::Inner.new(path: path + [key], value: { left: value_left, right: value_right })
       end
-    end
-
-    def left_delta
-      left_diff_keys.map { |key| Delta::Left.new(path: path + [key], value: left[key]) }
     end
 
     def common_keys
