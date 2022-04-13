@@ -23,7 +23,7 @@ module HashDeepDiff
       end
 
       def right
-        @delta.values.first
+        @value
       end
     end
   end

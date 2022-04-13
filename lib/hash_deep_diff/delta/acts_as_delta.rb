@@ -23,6 +23,7 @@ module HashDeepDiff
         end
 
         # TOFIX poor naming
+        # overrides parameter in initializer
         def path
           @prefix + [@delta.keys.first]
         end
@@ -54,9 +55,11 @@ module HashDeepDiff
           # TOFIX this may prohibit usage of hashes with Array keys
           if path.respond_to?(:to_ary)
             @delta = { path[-1] => value }
+            @value = value
             @prefix = path[0..-2]
           else
             @delta = { path => value }
+            @value = value
             @prefix = []
           end
         end
