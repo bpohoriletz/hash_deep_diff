@@ -11,29 +11,30 @@ module HashDeepDiff
       include Delta::ActsAsDelta
 
       def to_str
-        if @delta.values.first.respond_to?(:to_hash)
-          if @delta.values.first.keys == %i[left right]
-            if complex?
-              HashDeepDiff::Comparison.new(left, right, path).report
-            else
-              lines = <<~Q
-                -left#{diff_prefix} = #{left}
-                +right#{diff_prefix} = #{right}
-              Q
-              lines.strip
-            end
-          else
-            @delta.values.first.keys.map do |key|
-              self.class.new(path: path + [key], value: @delta.values.first[key])
-            end.join("\n").strip
-          end
+        return diff unless @delta.values.first.respond_to?(:to_hash)
+
+        if nested_diffs? && complex?
+          HashDeepDiff::Comparison.new(left, right, path).diff
+        elsif nested_diffs? && !complex?
+          diff
         else
-          lines = <<~Q
+          @delta.values.first.keys.map do |key|
+            self.class.new(path: path + [key], value: @delta.values.first[key])
+          end
+        end.join("\n").strip
+      end
+
+      def diff
+        [
+          <<~Q
             -left#{diff_prefix} = #{left}
             +right#{diff_prefix} = #{right}
           Q
-          lines.strip
-        end
+        ]
+      end
+
+      def nested_diffs?
+        @delta.values.first.keys == %i[left right]
       end
 
       def complex?
