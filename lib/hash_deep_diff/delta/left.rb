@@ -11,13 +11,19 @@ module HashDeepDiff
       include Delta::ActsAsDelta
 
       def to_str
-        if @delta.values.first.respond_to?(:to_hash)
-          @delta.values.first.keys.map do |key|
-            self.class.new(path: path + [key], value: @delta.values.first[key])
-          end.join("\n").strip
-        else
-          "+left#{diff_prefix} = #{@delta.values.first}"
-        end
+        return "+left#{diff_prefix} = #{left}" unless left.respond_to?(:to_hash)
+
+        left.keys.map do |key|
+          self.class.new(path: path + [key], value: left[key])
+        end.join("\n").strip
+      end
+
+      def left
+        @delta.values.first
+      end
+
+      def right
+        nil
       end
     end
   end
