@@ -19,7 +19,7 @@ module HashDeepDiff
       end
 
       def left
-        @delta.values.first
+        @value
       end
 
       def right
