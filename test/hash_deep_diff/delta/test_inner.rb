@@ -15,15 +15,15 @@ describe HashDeepDiff::Delta::Inner do
 
   describe '#complex?' do
     it 'is false if diff does not include nested hashes' do
-      assert !small.complex?
+      refute_predicate small, :complex?
     end
 
     it 'is false if only one part of diff includes nested hashes' do
-      assert !mediumsmall.complex?
+      refute_predicate mediumsmall, :complex?
     end
 
     it 'is true if diff has nested hashes' do
-      assert medium.complex?
+      assert_predicate medium, :complex?
     end
   end
 end
