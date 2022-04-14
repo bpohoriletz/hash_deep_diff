@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'delta/inner'
+require_relative 'delta'
 
 # :nodoc:
 module HashDeepDiff
@@ -41,7 +41,7 @@ module HashDeepDiff
 
         next if value_right.instance_of?(value_left.class) && (value_right == value_left)
 
-        memo << Delta::Inner.new(path: path + [key], value: { left: value_left, right: value_right })
+        memo << Delta.new(path: path + [key], value: { left: value_left, right: value_right })
       end
     end
 

@@ -2,10 +2,10 @@
 
 require 'test_helper'
 
-describe HashDeepDiff::Delta::Inner do
-  let(:small) { HashDeepDiff::Delta::Inner.new(path: :a, value: { left: :a, right: :b }) }
-  let(:mediumsmall) { HashDeepDiff::Delta::Inner.new(path: :a, value: { left: :a, right: { b: :b } }) }
-  let(:medium) { HashDeepDiff::Delta::Inner.new(path: :a, value: { left: { a: :a }, right: { b: :b } }) }
+describe HashDeepDiff::Delta do
+  let(:small) { HashDeepDiff::Delta.new(path: :a, value: { left: :a, right: :b }) }
+  let(:mediumsmall) { HashDeepDiff::Delta.new(path: :a, value: { left: :a, right: { b: :b } }) }
+  let(:medium) { HashDeepDiff::Delta.new(path: :a, value: { left: { a: :a }, right: { b: :b } }) }
 
   describe '#to_s' do
     it 'is convertable to string' do
@@ -28,9 +28,9 @@ describe HashDeepDiff::Delta::Inner do
   end
 
   it 'lists elements not found on the right' do
-    report = HashDeepDiff::Delta::Inner.new(path: :a,
-                                            value: { left: :b,
-                                                     right: HashDeepDiff::NO_VALUE }).to_s
+    report = HashDeepDiff::Delta.new(path: :a,
+                                     value: { left: :b,
+                                              right: HashDeepDiff::NO_VALUE }).to_s
 
     assert_equal('-left[a] = b', report)
   end
