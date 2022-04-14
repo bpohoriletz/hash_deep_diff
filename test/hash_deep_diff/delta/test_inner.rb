@@ -9,7 +9,7 @@ describe HashDeepDiff::Delta::Inner do
 
   describe '#to_s' do
     it 'is convertable to string' do
-      assert_equal("-left[a] = a\n+right[a] = b", small.to_s)
+      assert_equal("-left[a] = a\n+left[a] = b", small.to_s)
     end
   end
 
