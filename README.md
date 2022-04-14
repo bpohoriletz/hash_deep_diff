@@ -2,6 +2,9 @@
 
 Find the exact difference between two Hash objects and build a report to visualize it
 
+[![Gem
+Version](https://badge.fury.io/rb/hash_deep_diff.svg)](https://badge.fury.io/rb/hash_deep_diff)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -29,7 +32,7 @@ HashDeepDiff::Comparison.new(left, right).report
 ```
 ```diff
 - left[a] = a
-+ right[a] = b 
++ left[a] = b
 ```
 
 ## Contributing
