@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
-require_relative 'delta/left'
 require_relative 'delta/inner'
 require_relative 'delta/right'
 
 # :nodoc:
 module HashDeepDiff
-  # :nodoc:
+  # An instrument to build and report the difference between two hash-like objects
   class Comparison
     attr_reader :left, :right, :path
 
-    def diff(&block)
-      left_delta + deep_delta(&block) + right_delta
+    def diff
+      deep_delta + right_delta
     end
 
     def report
@@ -26,8 +25,8 @@ module HashDeepDiff
       @path = path.to_ary
     end
 
-    def deep_delta(&block)
-      delta(&block).flat_map do |diff|
+    def deep_delta
+      delta.flat_map do |diff|
         if diff.complex?
           self.class.new(diff.left, diff.right, diff.path).diff
         else
@@ -36,12 +35,10 @@ module HashDeepDiff
       end
     end
 
-    def delta(&block)
-      block ||= ->(val) { val }
-
-      common_keys.each_with_object([]) do |key, memo|
-        value_left = block.call(left[key])
-        value_right = block.call(right[key])
+    def delta
+      (left_diff_keys + common_keys).each_with_object([]) do |key, memo|
+        value_left = left[key] || NO_VALUE
+        value_right = right[key] || NO_VALUE
 
         next if value_right.instance_of?(value_left.class) && (value_right == value_left)
 
@@ -50,7 +47,7 @@ module HashDeepDiff
     end
 
     def left_delta
-      left_diff_keys.map { |key| Delta::Left.new(path: path + [key], value: left[key]) }
+      left_diff_keys.map { |key| Delta::Inner.new(path: path + [key], value: left[key]) }
     end
 
     def right_delta
