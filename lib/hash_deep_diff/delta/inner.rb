@@ -11,15 +11,27 @@ module HashDeepDiff
       include Delta::ActsAsDelta
 
       def to_str
-        lines = <<~Q
-          -left#{diff_prefix} = #{left}
-          +right#{diff_prefix} = #{right}
-        Q
-        lines.strip
+        [deletion, addition].compact.join("\n")
       end
 
       def complex?
         left.respond_to?(:to_hash) && right.respond_to?(:to_hash)
+      end
+
+      def addition
+        return nil if right == NO_VALUE
+
+        "+right#{diff_prefix} = #{right}"
+      end
+
+      def deletion
+        return nil if left == NO_VALUE
+
+        if left.respond_to?(:to_hash)
+          left.keys.map { |key| "-left#{diff_prefix}[#{key}] = #{left[key]}" }.join("\n")
+        else
+          "-left#{diff_prefix} = #{left}"
+        end
       end
 
       def left

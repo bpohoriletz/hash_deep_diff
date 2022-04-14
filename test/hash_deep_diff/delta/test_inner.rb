@@ -26,4 +26,12 @@ describe HashDeepDiff::Delta::Inner do
       assert_predicate medium, :complex?
     end
   end
+
+  it 'lists elements not found on the right' do
+    report = HashDeepDiff::Delta::Inner.new(path: :a,
+                                            value: { left: :b,
+                                                     right: HashDeepDiff::NO_VALUE }).to_s
+
+    assert_equal('-left[a] = b', report)
+  end
 end

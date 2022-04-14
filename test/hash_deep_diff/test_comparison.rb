@@ -17,7 +17,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal([left], diff)
+      assert_equal([{ a: { left: 'b', right: HashDeepDiff::NO_VALUE } }], diff)
     end
 
     it 'finds right if left is empty' do
@@ -33,7 +33,7 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal([{ a: 'b' }], diff)
+      assert_equal([{ a: { left: 'b', right: HashDeepDiff::NO_VALUE } }], diff)
     end
 
     it 'finds difference for hash with numeric values' do
@@ -43,7 +43,8 @@ describe HashDeepDiff::Comparison do
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal([{ a: 'a' }, { c: { left: 3, right: 'ccc' } }, { z: 'z' }], diff)
+      assert_equal([{ a: { left: 'a', right: HashDeepDiff::NO_VALUE } }, { c: { left: 3, right: 'ccc' } }, { z: 'z' }],
+                   diff)
     end
 
     it 'finds difference for hash with values of core types' do
@@ -66,16 +67,6 @@ describe HashDeepDiff::Comparison do
       assert_equal([{ c: { left: [1, 2, 3], right: [1, 3, 2] } }], diff)
       assert_equal([[:c]], diff.map(&:path))
     end
-
-    it 'finds difference for hash with converted values' do
-      left, right = load_fixture('one_level/big', 'one_level/big')
-      left.merge!({ c: [1, 2, 3] })
-      right.merge!({ c: [1, 3, 2] })
-
-      diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.sort if value.respond_to?(:sort) }
-
-      assert_empty(diff)
-    end
   end
 
   describe '#diff (for two level deep hashes)' do
@@ -83,9 +74,11 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/big', 'two_level/big')
       right.merge!({ b: { c: 'd' } })
 
-      diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.respond_to?(:to_ary) ? value.sort : value }
+      diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal([{ d: 'd' }, { c: { left: 'c', right: 'd' } }], diff.map(&:to_hash))
+      assert_equal(
+        [{ d: { left: 'd', right: HashDeepDiff::NO_VALUE } }, { c: { left: 'c', right: 'd' } }], diff
+      )
       assert_equal([%i[b d], %i[b c]], diff.map(&:path))
     end
 
@@ -93,9 +86,11 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/big', 'two_level/big')
       right.merge!({ b: { c: 'd', e: 3 } })
 
-      diff = HashDeepDiff::Comparison.new(left, right).diff { |value| value.respond_to?(:to_ary) ? value.sort : value }
+      diff = HashDeepDiff::Comparison.new(left, right).diff
 
-      assert_equal([{ d: 'd' }, { c: { left: 'c', right: 'd' } }, { e: 3 }], diff)
+      assert_equal(
+        [{ d: { left: 'd', right: HashDeepDiff::NO_VALUE } }, { c: { left: 'c', right: 'd' } }, { e: 3 }], diff
+      )
       assert_equal([%i[b d], %i[b c], %i[b e]], diff.map(&:path))
     end
   end
@@ -108,14 +103,14 @@ describe HashDeepDiff::Comparison do
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
       assert_equal(
-        [{ g: [1, 2, 3] },
+        [{ g: { left: [1, 2, 3], right: HashDeepDiff::NO_VALUE } },
          { e: { left: [1, 2, 3],
                 right: { f: { g: [1, 2, 3] }, h: { i: { j: { k: 'k', l: 'l' }, m: 'm' }, n: 'n' },
                          o: 'o', p: [1, 2, 3] } } },
          { r: 'r' },
          { s: { t: 't', u: 'u', v: { w: 'w', x: { y: { z: 'z' } } } } },
          { f: { left: 'f', right: { g: { h: 'j' } } } },
-         { n: 'n' },
+         { n: { left: 'n', right: HashDeepDiff::NO_VALUE } },
          { j: { left: { k: 'k', l: 'l' }, right: 'j' } },
          { m: { left: 'm', right: { n: 'n' } } },
          { k: 'k' },
@@ -130,14 +125,6 @@ describe HashDeepDiff::Comparison do
   end
 
   describe '#report (for one level deep hashes) ' do
-    it 'lists elements not found on the right' do
-      left, right = load_fixture('one_level/small', 'empty')
-
-      report = HashDeepDiff::Comparison.new(left, right).report
-
-      assert_equal('+left[a] = b', report)
-    end
-
     it 'lists elements missing on the left' do
       left, right = load_fixture('empty', 'one_level/small')
 
@@ -166,8 +153,8 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/big', 'two_level/big')
       right.delete(:b)
       diff = <<~Q
-        +left[b][c] = c
-        +left[b][d] = d
+        -left[b][c] = c
+        -left[b][d] = d
       Q
 
       report = HashDeepDiff::Comparison.new(left, right).report
@@ -179,9 +166,9 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/huge', 'two_level/huge')
       right.delete(:b)
       diff = <<~Q
-        +left[b][c] = c
-        +left[b][d] = d
-        +left[b][e] = [1, 2, 3]
+        -left[b][c] = c
+        -left[b][d] = d
+        -left[b][e] = [1, 2, 3]
       Q
 
       report = HashDeepDiff::Comparison.new(left, right).report
@@ -267,18 +254,20 @@ describe HashDeepDiff::Comparison do
     it 'builds git diff like text with discrepancies btween two hashes for deep changes' do
       left, right = load_fixture('n_level/huge', 'n_level/big')
       diff = <<~Q
-        +left[b][c][r] = r
-        +left[b][c][s][t] = t
-        +left[b][c][s][u] = u
-        +left[b][c][s][v][w] = w
-        +left[b][c][s][v][x][y][z] = z
-        -left[b][c][e] = {:f=>{:g=>[1, 2, 3]}, :h=>{:i=>{:j=>{:k=>"k", :l=>"l"}, :m=>"m"}, :n=>"n"}, :o=>"o", :p=>[1, 2, 3]}
+        -left[b][c][r] = r
+        -left[b][c][s][t] = t
+        -left[b][c][s][u] = u
+        -left[b][c][s][v] = {:w=>"w", :x=>{:y=>{:z=>"z"}}}
+        -left[b][c][e][f] = {:g=>[1, 2, 3]}
+        -left[b][c][e][h] = {:i=>{:j=>{:k=>"k", :l=>"l"}, :m=>"m"}, :n=>"n"}
+        -left[b][c][e][o] = o
+        -left[b][c][e][p] = [1, 2, 3]
         +right[b][c][e] = [1, 2, 3]
-        +left[h][i][k] = k
-        +left[h][i][l] = l
+        -left[h][i][k] = k
+        -left[h][i][l] = l
         -left[h][i][j] = j
         +right[h][i][j] = {:k=>"k", :l=>"l"}
-        -left[h][i][m] = {:n=>"n"}
+        -left[h][i][m][n] = n
         +right[h][i][m] = m
         -left[h][n] = n
         -left[g] = [1, 2, 3]
