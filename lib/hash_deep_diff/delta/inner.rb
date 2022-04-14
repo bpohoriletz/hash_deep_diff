@@ -4,19 +4,13 @@ require_relative 'acts_as_delta'
 
 module HashDeepDiff
   module Delta
-    # Representation of the pure left diff
-    # i.e element that are missing in the hash on the right of the comparison
-    # for example left diff of { a: a } and {} is { a: a }
+    # Representation of the inner diff
+    # i.e element is predent on both left and right and value is different
+    # for example inner diff of { a: a } and { a: b } is { a: { left: a, right: b } }
     class Inner
       include Delta::ActsAsDelta
 
       def to_str
-        return diff unless complex?
-
-        HashDeepDiff::Comparison.new(left, right, path).report
-      end
-
-      def diff
         lines = <<~Q
           -left#{diff_prefix} = #{left}
           +right#{diff_prefix} = #{right}

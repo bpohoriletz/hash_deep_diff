@@ -36,14 +36,6 @@ module HashDeepDiff
       end
     end
 
-    def left_delta
-      left_diff_keys.map { |key| Delta::Left.new(path: path + [key], value: left[key]) }
-    end
-
-    def right_delta
-      right_diff_keys.map { |key| Delta::Right.new(path: path + [key], value: right[key]) }
-    end
-
     def delta(&block)
       block ||= ->(val) { val }
 
@@ -57,16 +49,24 @@ module HashDeepDiff
       end
     end
 
+    def left_delta
+      left_diff_keys.map { |key| Delta::Left.new(path: path + [key], value: left[key]) }
+    end
+
+    def right_delta
+      right_diff_keys.map { |key| Delta::Right.new(path: path + [key], value: right[key]) }
+    end
+
     def common_keys
       left.keys & right.keys
     end
 
-    def right_diff_keys
-      right.keys - left.keys
-    end
-
     def left_diff_keys
       left.keys - right.keys
+    end
+
+    def right_diff_keys
+      right.keys - left.keys
     end
   end
 end
