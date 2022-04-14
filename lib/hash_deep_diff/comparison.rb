@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'delta/inner'
-require_relative 'delta/right'
 
 # :nodoc:
 module HashDeepDiff
@@ -10,7 +9,7 @@ module HashDeepDiff
     attr_reader :left, :right, :path
 
     def diff
-      deep_delta + right_delta
+      deep_delta
     end
 
     def report
@@ -36,7 +35,7 @@ module HashDeepDiff
     end
 
     def delta
-      (left_diff_keys + common_keys).each_with_object([]) do |key, memo|
+      common_keys.each_with_object([]) do |key, memo|
         value_left = left[key] || NO_VALUE
         value_right = right[key] || NO_VALUE
 
@@ -46,24 +45,8 @@ module HashDeepDiff
       end
     end
 
-    def left_delta
-      left_diff_keys.map { |key| Delta::Inner.new(path: path + [key], value: left[key]) }
-    end
-
-    def right_delta
-      right_diff_keys.map { |key| Delta::Right.new(path: path + [key], value: right[key]) }
-    end
-
     def common_keys
-      left.keys & right.keys
-    end
-
-    def left_diff_keys
-      left.keys - right.keys
-    end
-
-    def right_diff_keys
-      right.keys - left.keys
+      (left.keys + right.keys).uniq
     end
   end
 end
