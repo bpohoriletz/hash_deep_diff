@@ -20,7 +20,6 @@
 guard :rubocop do
   watch(/.+\.rb$/)
   watch(/.+\.gemspec$/)
-  watch(%r{(?:.+/)?\.rubocop(?:_todo)?\.yml$}) { |m| File.dirname(m[0]) }
 end
 
 guard :minitest do
