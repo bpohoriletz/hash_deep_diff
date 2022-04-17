@@ -1,9 +1,11 @@
 # HashDeepDiff
+[![Gem
+Version](https://badge.fury.io/rb/hash_deep_diff.svg)](https://badge.fury.io/rb/hash_deep_diff) ![GitHub Workflow
+Status](https://img.shields.io/github/workflow/status/bpohoriletz/hash_deep_diff/CI)
+![GitHub](https://img.shields.io/github/license/bpohoriletz/hash_deep_diff)
+
 
 Find the exact difference between two Hash objects and build a report to visualize it
-
-[![Gem
-Version](https://badge.fury.io/rb/hash_deep_diff.svg)](https://badge.fury.io/rb/hash_deep_diff)
 
 ## Installation
 
