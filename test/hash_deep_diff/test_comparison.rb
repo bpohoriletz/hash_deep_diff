@@ -258,15 +258,19 @@ describe HashDeepDiff::Comparison do
     it 'builds git diff like text with discrepancies btween two hashes for deep changes' do
       left, right = load_fixture('n_level/huge', 'n_level/big')
       diff = <<~Q
-        -left[b][c][e][f] = {:g=>[1, 2, 3]}
-        -left[b][c][e][h] = {:i=>{:j=>{:k=>"k", :l=>"l"}, :m=>"m"}, :n=>"n"}
+        -left[b][c][e][f][g] = [1, 2, 3]
+        -left[b][c][e][h][i][j][k] = k
+        -left[b][c][e][h][i][j][l] = l
+        -left[b][c][e][h][i][m] = m
+        -left[b][c][e][h][n] = n
         -left[b][c][e][o] = o
         -left[b][c][e][p] = [1, 2, 3]
         +left[b][c][e] = [1, 2, 3]
         -left[b][c][r] = r
         -left[b][c][s][t] = t
         -left[b][c][s][u] = u
-        -left[b][c][s][v] = {:w=>"w", :x=>{:y=>{:z=>"z"}}}
+        -left[b][c][s][v][w] = w
+        -left[b][c][s][v][x][y][z] = z
         -left[h][i][j] = j
         +left[h][i][j][k] = k
         +left[h][i][j][l] = l

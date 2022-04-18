@@ -6,10 +6,24 @@ describe HashDeepDiff::Delta do
   let(:small) { HashDeepDiff::Delta.new(path: :a, value: { left: :a, right: :b }) }
   let(:mediumsmall) { HashDeepDiff::Delta.new(path: :a, value: { left: :a, right: { b: :b } }) }
   let(:medium) { HashDeepDiff::Delta.new(path: :a, value: { left: { a: :a }, right: { b: :b } }) }
+  let(:big) do
+    HashDeepDiff::Delta.new(path: :a, value: { left: load_fixture('empty'),
+                                               right: load_fixture('two_level/small') })
+  end
 
   describe '#to_s' do
     it 'is convertable to string' do
       assert_equal("-left[a] = a\n+left[a] = b", small.to_s)
+    end
+
+    it 'reports full difference betweeh hashes' do
+      diff = <<~Q
+        -left[a] = {}
+        +left[a][a][b] = b
+        +left[a][a][c] = c
+      Q
+
+      assert_equal(diff.strip, big.to_s)
     end
   end
 
