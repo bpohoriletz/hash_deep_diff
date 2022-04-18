@@ -30,3 +30,7 @@ guard :minitest do
   watch(%r{^test/test_helper\.rb$})      { 'test' }
   watch(%r{^test/support/.*$})           { 'test' }
 end
+
+guard 'yard' do
+  watch(%r{lib/.+\.rb})
+end
