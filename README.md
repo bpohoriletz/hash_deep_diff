@@ -36,6 +36,8 @@ HashDeepDiff::Comparison.new(left, right).report
 - left[a] = a
 + left[a] = b
 ```
+please see [Documentation](https://rdoc.info/gems/hash_deep_diff) for
+more info
 
 ## Contributing
 
