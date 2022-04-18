@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module HashDeepDiff
   # Visual representation of the difference between wo values
   class Report
@@ -12,13 +11,9 @@ module HashDeepDiff
     def to_str
       if @value.respond_to?(:to_hash) && !@value.empty?
         [@mode, diff_prefix, ' = ', "{}\n"].join +
-        @value.keys.map do |key|
-          Report.new(
-            path: @path + [key],
-            value: @value[key],
-            mode: @mode
-          )
-        end.join("\n")
+          @value.keys.map do |key|
+            Report.new(path: @path + [key], value: @value[key], mode: @mode)
+          end.join("\n")
       else
         [@mode, diff_prefix, ' = ', @value.to_s].join
       end

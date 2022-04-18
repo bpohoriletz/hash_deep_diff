@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'hash_deep_diff/version'
-require 'hash_deep_diff/report'
 require 'hash_deep_diff/comparison'
 
 module HashDeepDiff
