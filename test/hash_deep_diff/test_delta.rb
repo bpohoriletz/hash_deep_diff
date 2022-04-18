@@ -19,6 +19,8 @@ describe HashDeepDiff::Delta do
     it 'reports full difference betweeh hashes' do
       diff = <<~Q
         -left[a] = {}
+        +left[a] = {}
+        +left[a][a] = {}
         +left[a][a][b] = b
         +left[a][a][c] = c
       Q

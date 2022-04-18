@@ -157,6 +157,7 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/big', 'two_level/big')
       right.delete(:b)
       diff = <<~Q
+        -left[b] = {}
         -left[b][c] = c
         -left[b][d] = d
       Q
@@ -170,6 +171,7 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/huge', 'two_level/huge')
       right.delete(:b)
       diff = <<~Q
+        -left[b] = {}
         -left[b][c] = c
         -left[b][d] = d
         -left[b][e] = [1, 2, 3]
@@ -184,6 +186,7 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/big', 'two_level/big')
       left.delete(:b)
       diff = <<~Q
+        +left[b] = {}
         +left[b][c] = c
         +left[b][d] = d
       Q
@@ -197,6 +200,7 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('two_level/huge', 'two_level/huge')
       left.delete(:b)
       diff = <<~Q
+        +left[b] = {}
         +left[b][c] = c
         +left[b][d] = d
         +left[b][e] = [1, 2, 3]
@@ -258,7 +262,12 @@ describe HashDeepDiff::Comparison do
     it 'builds git diff like text with discrepancies btween two hashes for deep changes' do
       left, right = load_fixture('n_level/huge', 'n_level/big')
       diff = <<~Q
+        -left[b][c][e] = {}
+        -left[b][c][e][f] = {}
         -left[b][c][e][f][g] = [1, 2, 3]
+        -left[b][c][e][h] = {}
+        -left[b][c][e][h][i] = {}
+        -left[b][c][e][h][i][j] = {}
         -left[b][c][e][h][i][j][k] = k
         -left[b][c][e][h][i][j][l] = l
         -left[b][c][e][h][i][m] = m
@@ -267,15 +276,21 @@ describe HashDeepDiff::Comparison do
         -left[b][c][e][p] = [1, 2, 3]
         +left[b][c][e] = [1, 2, 3]
         -left[b][c][r] = r
+        -left[b][c][s] = {}
         -left[b][c][s][t] = t
         -left[b][c][s][u] = u
+        -left[b][c][s][v] = {}
         -left[b][c][s][v][w] = w
+        -left[b][c][s][v][x] = {}
+        -left[b][c][s][v][x][y] = {}
         -left[b][c][s][v][x][y][z] = z
         -left[h][i][j] = j
+        +left[h][i][j] = {}
         +left[h][i][j][k] = k
         +left[h][i][j][l] = l
         -left[h][i][k] = k
         -left[h][i][l] = l
+        -left[h][i][m] = {}
         -left[h][i][m][n] = n
         +left[h][i][m] = m
         +left[h][n] = n
