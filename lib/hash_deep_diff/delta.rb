@@ -76,7 +76,7 @@ module HashDeepDiff
 
       def to_str
         if @value.respond_to?(:to_hash) && !@value.empty?
-          #[@mode, diff_prefix, ' = ', "{}\n"].join +
+          [@mode, diff_prefix, ' = ', "{}\n"].join +
           @value.keys.map do |key|
             Report.new(
               path: @path + [key],
