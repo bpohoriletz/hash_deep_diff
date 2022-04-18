@@ -16,7 +16,7 @@ module HashDeepDiff
     # instance of a class as a Hash
     module InstanceMethods
       def to_h
-        @delta
+        to_hash
       end
 
       def to_hash
