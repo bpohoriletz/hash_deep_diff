@@ -40,7 +40,8 @@ module HashDeepDiff
     # @!attribute [r] right
     #    @return [Hash] Hash that the original is compared to
     # @!attribute [r] path
-    #    @return [Array<Object>] to a compared Hashes (is empty for top-level comparison)
+    #    @return [Array<Object>] subset of keys from original Hashes to fetch compared Hashes
+    #    (is empty for top-level comparison)
     attr_reader :left, :right, :path
 
     # @return [String]
