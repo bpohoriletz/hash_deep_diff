@@ -46,7 +46,7 @@ module HashDeepDiff
 
     # @return [String]
     def report
-      diff.join("\n")
+      diff.join
     end
 
     # @return [Array<HashDeepDiff::Delta>]

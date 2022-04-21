@@ -15,7 +15,8 @@ module HashDeepDiff
     # Visual representation of additions and deletiond at given +path+
     # @return [String]
     def to_str
-      [deletion, addition].reject(&:empty?).join("\n")
+      Report.new(path: path, value: left, mode: Report::Mode::DELETION).to_s +
+        Report.new(path: path, value: right, mode: Report::Mode::ADDITION).to_s
     end
 
     # Returns true if we have nested Hashes
@@ -62,22 +63,6 @@ module HashDeepDiff
         @value = value
         @prefix = []
       end
-    end
-
-    # Visual representation of additions
-    # @return [String]
-    def deletion
-      return '' if left == NO_VALUE
-
-      Report.new(path: path, value: left, mode: Report::Mode::DELETION)
-    end
-
-    # Visual representation of deletions
-    # @return [String]
-    def addition
-      return '' if right == NO_VALUE
-
-      Report.new(path: path, value: right)
     end
   end
 end

@@ -13,7 +13,7 @@ describe HashDeepDiff::Delta do
 
   describe '#to_s' do
     it 'is convertable to string' do
-      assert_equal("-left[a] = a\n+left[a] = b", small.to_s)
+      assert_equal("-left[a] = a\n+left[a] = b\n", small.to_s)
     end
 
     it 'reports full difference betweeh hashes' do
@@ -25,7 +25,7 @@ describe HashDeepDiff::Delta do
         +left[a][a][c] = c
       Q
 
-      assert_equal(diff.strip, big.to_s)
+      assert_equal(diff, big.to_s)
     end
   end
 
@@ -48,6 +48,6 @@ describe HashDeepDiff::Delta do
                                      value: { left: :b,
                                               right: HashDeepDiff::NO_VALUE }).to_s
 
-    assert_equal('-left[a] = b', report)
+    assert_equal("-left[a] = b\n", report)
   end
 end
