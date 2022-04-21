@@ -26,10 +26,15 @@ module HashDeepDiff
       end
     end
 
-    # A report with all additions and deletions
+    # see {#to_str}
     # @return [String]
     def to_s
       to_str
+    end
+
+    # @return [Bool]
+    def empty?
+      false
     end
 
     private
