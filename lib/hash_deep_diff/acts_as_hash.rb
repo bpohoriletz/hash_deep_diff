@@ -17,12 +17,14 @@ module HashDeepDiff
     # We assume that the class will initialize instance variable +@delta+ that will return
     # a representation of an instance of a class as a +Hash+ object
     module InstanceMethods
-      # a +Hash+ representation of an object
+      # see {#to_hash}
+      # @return [Hash]
       def to_h
         to_hash
       end
 
       # a +Hash+ representation of an object
+      # @return [Hash]
       def to_hash
         @delta
       end
