@@ -13,28 +13,30 @@ module HashDeepDiff
       DELETION = '-left'
     end
 
-    # A report with all additions and deletions
-    # @return [String]
-    def to_str
-      if @value.respond_to?(:to_hash) && !@value.empty?
-        [@mode, diff_prefix, ' = ', "{}\n"].join +
-          @value.keys.map do |key|
-            Report.new(path: @path + [key], value: @value[key], mode: @mode)
-          end.join("\n")
-      else
-        [@mode, diff_prefix, ' = ', @value.to_s].join
-      end
-    end
-
     # see {#to_str}
     # @return [String]
     def to_s
       to_str
     end
 
+    # A report with all additions and deletions
+    # @return [String]
+    def to_str
+      return '' if @value == NO_VALUE
+
+      if @value.respond_to?(:to_hash) && !@value.empty?
+        [@mode, diff_prefix, ' = ', "{}\n"].join +
+          @value.keys.map do |key|
+            Report.new(path: @path + [key], value: @value[key], mode: @mode).to_s
+          end.join
+      else
+        [@mode, diff_prefix, ' = ', @value.to_s, "\n"].join
+      end
+    end
+
     # @return [Bool]
     def empty?
-      false
+      @value == NO_VALUE
     end
 
     private
