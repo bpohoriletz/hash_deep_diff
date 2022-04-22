@@ -55,20 +55,8 @@ module HashDeepDiff
     # @return [Array<HashDeepDiff::Delta>]
     def diff
       comparison.map do |delta|
-        # if there are nested hashes we need to compare them furter
-        # if no we return difference between values (HashDeepDiff::Delta)
-        if delta.complex? && delta.simple_right?
-          [
-            Delta.new(path: delta.path, value: { left: {}, right: NO_VALUE }),
-            self.class.new(NO_VALUE, delta.right, delta.path).diff,
-            self.class.new(delta.left, NO_VALUE, delta.path).diff
-          ]
-        elsif delta.complex? && delta.simple_left?
-          [
-            Delta.new(path: delta.path, value: { left: NO_VALUE, right: {} }),
-            self.class.new(NO_VALUE, delta.right, delta.path).diff,
-            self.class.new(delta.left, NO_VALUE, delta.path).diff
-          ]
+        if delta.complex? && (delta.simple_right? || delta.simple_left?)
+          missing_mesting(delta)
         elsif delta.complex?
           self.class.new(delta.left, delta.right, delta.path).diff
         else
@@ -97,6 +85,22 @@ module HashDeepDiff
 
         memo << Delta.new(path: path + [key], value: { left: value_left(key), right: value_right(key) })
       end
+    end
+
+    # if old value was a +Hash+ and new is not (or vice versa) we report +Hash+ addition/deletion
+    # @param [Delta] delta
+    # @return [Array<Delta>]
+    def missing_mesting(delta)
+      change = if delta.simple_left?
+                 Delta.new(path: delta.path, value: { left: NO_VALUE, right: {} })
+               elsif delta.simple_right?
+                 Delta.new(path: delta.path, value: { left: {}, right: NO_VALUE })
+               end
+      [
+        change,
+        self.class.new(NO_VALUE, delta.right, delta.path).diff,
+        self.class.new(delta.left, NO_VALUE, delta.path).diff
+      ]
     end
 
     # @param [Object] key the key which value we're currently comparing
