@@ -23,15 +23,11 @@ module HashDeepDiff
     # @return [String]
     def to_str
       return '' if @value == NO_VALUE
+      return [@mode, diff_prefix, ' = ', @value.to_s, "\n"].join if !@value.respond_to?(:to_hash) || @value.empty?
 
-      if @value.respond_to?(:to_hash) && !@value.empty?
-        [@mode, diff_prefix, ' = ', "{}\n"].join +
-          @value.keys.map do |key|
-            Report.new(path: @path + [key], value: @value[key], mode: @mode).to_s
-          end.join
-      else
-        [@mode, diff_prefix, ' = ', @value.to_s, "\n"].join
-      end
+      @value.keys.map do |key|
+        self.class.new(path: @path + [key], value: @value[key], mode: @mode).to_s
+      end.join
     end
 
     # @return [Bool]
