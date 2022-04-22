@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'acts_as_hash'
-require_relative 'report'
 
 module HashDeepDiff
   # Representation of the diff of two values
