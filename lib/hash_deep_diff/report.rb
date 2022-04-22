@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module HashDeepDiff
-  # Visual representation of the difference between two values
+  # Visual representation of the {Delta}
   class Report
     # We have two cases
     #   * added - when value on the left is missing
@@ -19,31 +19,35 @@ module HashDeepDiff
       to_str
     end
 
-    # A report with all additions and deletions
+    # A report on additions and deletions
     # @return [String]
     def to_str
-      return '' if @value == NO_VALUE
-      return [@mode, diff_prefix, ' = ', @value.to_s, "\n"].join if !@value.respond_to?(:to_hash) || @value.empty?
-
-      @value.keys.map do |key|
-        self.class.new(path: @path + [key], value: @value[key], mode: @mode).to_s
-      end.join
+      addition + deletion
     end
 
-    # @return [Bool]
-    def empty?
-      @value == NO_VALUE
+    # @return [String]
+    def addition
+      return '' if old_val == NO_VALUE
+
+      return [Mode::DELETION, diff_prefix, ' = ', old_val.to_s, "\n"].join
+    end
+
+    # @return [String]
+    def deletion
+      return '' if new_val == NO_VALUE
+
+      return [Mode::ADDITION, diff_prefix, ' = ', new_val.to_s, "\n"].join
     end
 
     private
 
-    # @param [Array] path Keys from compared objects to fetch the compared values
-    # @param [Object] value value from a  compared object at +@path+
-    # @param [Mode::ADDITION, Mode::DELETION] mode
-    def initialize(path:, value:, mode: Mode::ADDITION)
-      @path = path.to_ary
-      @value = value
-      @mode = mode
+    attr_reader :old_val, :new_val
+
+    # @param [Delta] delta diff to report
+    def initialize(delta:)
+      @path = delta.path.to_ary
+      @old_val = delta.left
+      @new_val = delta.right
     end
 
     # Visual representation of keys from compared objects needed to fetch the compared values
