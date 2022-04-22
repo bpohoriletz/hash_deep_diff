@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'acts_as_hash'
+require 'forwardable'
 
 module HashDeepDiff
   # Representation of the diff of two values
@@ -9,8 +9,10 @@ module HashDeepDiff
   #   - diff of { a: a } and { a: b } is { a: { left: a, right: b } }
   #   - diff of {} and { a: b } is { a: { left: HashDeepDiff::NO_VALUE, right: b } }
   class Delta
-    include ActsAsHash
+    extend Forwardable
 
+    def_delegators :@delta, :==, :each_with_object, :each_key, :[],
+                   :to_a, :empty?, :keys
     # Returns true if we have nested Hashes
     # @return [Bool]
     def complex?
@@ -43,6 +45,17 @@ module HashDeepDiff
     # Value we compare to
     def right
       @value[:right]
+    end
+
+    # see {#to_hash}
+    # @return [Hash]
+    def to_h
+      to_hash
+    end
+
+    # @return [Hash]
+    def to_hash
+      @delta
     end
 
     private
