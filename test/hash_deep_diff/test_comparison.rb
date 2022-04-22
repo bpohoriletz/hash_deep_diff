@@ -106,23 +106,100 @@ describe HashDeepDiff::Comparison do
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
       assert_equal(
-        [{ e: { left: [1, 2, 3],
-                right: { f: { g: [1, 2, 3] }, h: { i: { j: { k: 'k', l: 'l' }, m: 'm' }, n: 'n' },
-                         o: 'o', p: [1, 2, 3] } } },
+        [{ e: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { f: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { g: { left: HashDeepDiff::NO_VALUE, right: [1, 2, 3] } },
+         { f: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
+         { h: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { i: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { j: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { k: { left: HashDeepDiff::NO_VALUE, right: 'k' } },
+         { l: { left: HashDeepDiff::NO_VALUE, right: 'l' } },
+         { j: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
+         { m: { left: HashDeepDiff::NO_VALUE, right: 'm' } },
+         { i: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
+         { n: { left: HashDeepDiff::NO_VALUE, right: 'n' } },
+         { h: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
+         { o: { left: HashDeepDiff::NO_VALUE, right: 'o' } },
+         { p: { left: HashDeepDiff::NO_VALUE, right: [1, 2, 3] } },
+         { e: { left: [1, 2, 3], right: HashDeepDiff::NO_VALUE } },
          { r: { left: HashDeepDiff::NO_VALUE, right: 'r' } },
-         { s: { left: HashDeepDiff::NO_VALUE,
-                right: { t: 't', u: 'u', v: { w: 'w', x: { y: { z: 'z' } } } } } },
-         { f: { left: 'f', right: { g: { h: 'j' } } } },
+         { s: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { t: { left: HashDeepDiff::NO_VALUE, right: 't' } },
+         { u: { left: HashDeepDiff::NO_VALUE, right: 'u' } },
+         { v: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { w: { left: HashDeepDiff::NO_VALUE, right: 'w' } },
+         { x: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { y: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { z: { left: HashDeepDiff::NO_VALUE, right: 'z' } },
+         { y: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
+         { x: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
+         { v: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
+         { s: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
+         { f: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { g: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { h: { left: HashDeepDiff::NO_VALUE, right: 'j' } },
+         { g: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
+         { f: { left: 'f', right: HashDeepDiff::NO_VALUE } },
          { g: { left: [1, 2, 3], right: HashDeepDiff::NO_VALUE } },
-         { j: { left: { k: 'k', l: 'l' }, right: 'j' } },
-         { m: { left: 'm', right: { n: 'n' } } },
+         { j: { left: {}, right: HashDeepDiff::NO_VALUE } },
+         { j: { left: HashDeepDiff::NO_VALUE, right: 'j' } },
+         { k: { left: 'k', right: HashDeepDiff::NO_VALUE } },
+         { l: { left: 'l', right: HashDeepDiff::NO_VALUE } },
+         { m: { left: HashDeepDiff::NO_VALUE, right: {} } },
+         { n: { left: HashDeepDiff::NO_VALUE, right: 'n' } },
+         { m: { left: 'm', right: HashDeepDiff::NO_VALUE } },
          { k: { left: HashDeepDiff::NO_VALUE, right: 'k' } },
          { l: { left: HashDeepDiff::NO_VALUE, right: 'l' } },
          { n: { left: 'n', right: HashDeepDiff::NO_VALUE } }],
         diff
       )
       assert_equal(
-        [%i[b c e], %i[b c r], %i[b c s], [:f], [:g], %i[h i j], %i[h i m], %i[h i k], %i[h i l],
+        [%i[b c e],
+         %i[b c e f],
+         %i[b c e f g],
+         %i[b c e f],
+         %i[b c e h],
+         %i[b c e h i],
+         %i[b c e h i j],
+         %i[b c e h i j k],
+         %i[b c e h i j l],
+         %i[b c e h i j],
+         %i[b c e h i m],
+         %i[b c e h i],
+         %i[b c e h n],
+         %i[b c e h],
+         %i[b c e o],
+         %i[b c e p],
+         %i[b c e],
+         %i[b c r],
+         %i[b c s],
+         %i[b c s t],
+         %i[b c s u],
+         %i[b c s v],
+         %i[b c s v w],
+         %i[b c s v x],
+         %i[b c s v x y],
+         %i[b c s v x y z],
+         %i[b c s v x y],
+         %i[b c s v x],
+         %i[b c s v],
+         %i[b c s],
+         [:f],
+         %i[f g],
+         %i[f g h],
+         %i[f g],
+         [:f],
+         [:g],
+         %i[h i j],
+         %i[h i j],
+         %i[h i j k],
+         %i[h i j l],
+         %i[h i m],
+         %i[h i m n],
+         %i[h i m],
+         %i[h i k],
+         %i[h i l],
          %i[h n]], diff.map(&:path)
       )
     end
@@ -263,6 +340,7 @@ describe HashDeepDiff::Comparison do
       left, right = load_fixture('n_level/huge', 'n_level/big')
       diff = <<~Q
         -left[b][c][e] = {}
+        +left[b][c][e] = [1, 2, 3]
         -left[b][c][e][f] = {}
         -left[b][c][e][f][g] = [1, 2, 3]
         -left[b][c][e][h] = {}
@@ -274,7 +352,6 @@ describe HashDeepDiff::Comparison do
         -left[b][c][e][h][n] = n
         -left[b][c][e][o] = o
         -left[b][c][e][p] = [1, 2, 3]
-        +left[b][c][e] = [1, 2, 3]
         -left[b][c][r] = r
         -left[b][c][s] = {}
         -left[b][c][s][t] = t
@@ -284,15 +361,15 @@ describe HashDeepDiff::Comparison do
         -left[b][c][s][v][x] = {}
         -left[b][c][s][v][x][y] = {}
         -left[b][c][s][v][x][y][z] = z
-        -left[h][i][j] = j
         +left[h][i][j] = {}
         +left[h][i][j][k] = k
         +left[h][i][j][l] = l
+        -left[h][i][j] = j
         -left[h][i][k] = k
         -left[h][i][l] = l
         -left[h][i][m] = {}
-        -left[h][i][m][n] = n
         +left[h][i][m] = m
+        -left[h][i][m][n] = n
         +left[h][n] = n
         +left[g] = [1, 2, 3]
       Q

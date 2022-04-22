@@ -51,26 +51,46 @@ module HashDeepDiff
 
     # @return [Array<HashDeepDiff::Delta>]
     def diff
-      comparison.flat_map do |delta|
+      comparison.map do |delta|
         # if there are nested hashes we need to compare them furter
         # if no we return difference between values (HashDeepDiff::Delta)
-        delta.complex? ? self.class.new(delta.left, delta.right, delta.path).diff : delta
-      end
+        if delta.complex?
+          if delta.simple_right?
+            [
+              Delta.new(path: delta.path, value: { left: {}, right: NO_VALUE }),
+              self.class.new(NO_VALUE, delta.right, delta.path).diff,
+              self.class.new(delta.left, NO_VALUE, delta.path).diff
+            ]
+          elsif delta.simple_left?
+            [
+              Delta.new(path: delta.path, value: { left: NO_VALUE, right: {} }),
+              self.class.new(NO_VALUE, delta.right, delta.path).diff,
+              self.class.new(delta.left, NO_VALUE, delta.path).diff
+            ]
+          else
+            self.class.new(delta.left, delta.right, delta.path).diff
+          end
+        else
+          delta
+        end
+      end.flatten
     end
 
     private
 
-    # @param [Hash] left original version of the hash
-    # @param [Hash] right new version of the hash
+    # @param [Object] left original version
+    # @param [Object] right new version
     # @param [Array] prefix keys to fetch current comparison (not empty for nested comparisons)
     def initialize(left, right, prefix = [])
-      @left = left.to_hash
-      @right = right.to_hash
+      @left = left
+      @right = right
       @path = prefix.to_ary
     end
 
     # @return [Array<HashDeepDiff::Delta>]
     def comparison
+      return [Delta.new(path: path, value: { left: left, right: right })] if common_keys.empty?
+
       common_keys.each_with_object([]) do |key, memo|
         next if values_equal?(key)
 
@@ -84,22 +104,28 @@ module HashDeepDiff
       value_right(key).instance_of?(value_left(key).class) && (value_right(key) == value_left(key))
     end
 
-    # Original value
     # @param [Object] key the key which value we're currently comparing
     def value_left(key)
+      return NO_VALUE if left == NO_VALUE
+
       left[key] || NO_VALUE
     end
 
-    # Value we compare to
     # @param [Object] key the key which value we're currently comparing
     def value_right(key)
+      return NO_VALUE if right == NO_VALUE
+
       right[key] || NO_VALUE
     end
 
     # All keys from both original and compared objects
     # @return [Array]
     def common_keys
-      (left.keys + right.keys).uniq
+      keys = []
+      keys += left.keys if left.respond_to?(:keys)
+      keys += right.keys if right.respond_to?(:keys)
+
+      keys.uniq
     end
   end
 end
