@@ -46,10 +46,7 @@ module HashDeepDiff
 
     # @return [String]
     def report
-      diff.map do |delta|
-        Report.new(path: delta.path, value: delta.left, mode: Report::Mode::DELETION).to_s +
-          Report.new(path: delta.path, value: delta.right, mode: Report::Mode::ADDITION).to_s
-      end.join
+      diff.map { |delta| reporting_engine.new(delta: delta).to_s }.join
     end
 
     # @return [Array<HashDeepDiff::Delta>]
@@ -67,13 +64,16 @@ module HashDeepDiff
 
     private
 
+    attr_reader :reporting_engine
+
     # @param [Object] left original version
     # @param [Object] right new version
     # @param [Array] prefix keys to fetch current comparison (not empty for nested comparisons)
-    def initialize(left, right, prefix = [])
+    def initialize(left, right, prefix = [], reporting_engine: Report)
       @left = left
       @right = right
       @path = prefix.to_ary
+      @reporting_engine = reporting_engine
     end
 
     # @return [Array<HashDeepDiff::Delta>]
