@@ -22,7 +22,19 @@ module HashDeepDiff
     # Returns true if we have nested Hashes
     # @return [Bool]
     def complex?
-      left.respond_to?(:to_hash) && right.respond_to?(:to_hash)
+      !simple_left? || !simple_right?
+    end
+
+    # Returns true if left value has no nested Hashes
+    # @return [Bool]
+    def simple_left?
+      !left.respond_to?(:to_hash)
+    end
+
+    # Returns true if right value has no nested Hashes
+    # @return [Bool]
+    def simple_right?
+      !right.respond_to?(:to_hash)
     end
 
     # Keys needed to fetch values that we're comparing

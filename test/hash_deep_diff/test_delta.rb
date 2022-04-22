@@ -4,6 +4,7 @@ require 'test_helper'
 
 describe HashDeepDiff::Delta do
   let(:small) { HashDeepDiff::Delta.new(path: :a, value: { left: :a, right: :b }) }
+  let(:smallmedium) { HashDeepDiff::Delta.new(path: :a, value: { left: { a: :a }, right: :b }) }
   let(:mediumsmall) { HashDeepDiff::Delta.new(path: :a, value: { left: :a, right: { b: :b } }) }
   let(:medium) { HashDeepDiff::Delta.new(path: :a, value: { left: { a: :a }, right: { b: :b } }) }
   let(:big) do
@@ -34,8 +35,12 @@ describe HashDeepDiff::Delta do
       refute_predicate small, :complex?
     end
 
-    it 'is false if only one part of diff includes nested hashes' do
-      refute_predicate mediumsmall, :complex?
+    it 'is true if right part of diff includes nested hashes' do
+      assert_predicate mediumsmall, :complex?
+    end
+
+    it 'is true if left part of diff includes nested hashes' do
+      assert_predicate smallmedium, :complex?
     end
 
     it 'is true if diff has nested hashes' do
