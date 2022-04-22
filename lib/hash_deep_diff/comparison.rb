@@ -55,7 +55,7 @@ module HashDeepDiff
         if delta.complex? && (delta.simple_right? || delta.simple_left?)
           missing_mesting(delta)
         elsif delta.complex?
-          self.class.new(delta.left, delta.right, delta.path).diff
+          self.class.new(delta.left, delta.right, delta.path, reporting_engine: reporting_engine).diff
         else
           delta
         end
@@ -69,7 +69,7 @@ module HashDeepDiff
     # @param [Object] left original version
     # @param [Object] right new version
     # @param [Array] prefix keys to fetch current comparison (not empty for nested comparisons)
-    def initialize(left, right, prefix = [], reporting_engine: Report)
+    def initialize(left, right, prefix = [], reporting_engine: Reports::Diff)
       @left = left
       @right = right
       @path = prefix.to_ary
