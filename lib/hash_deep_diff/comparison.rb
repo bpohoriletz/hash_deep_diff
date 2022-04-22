@@ -46,7 +46,10 @@ module HashDeepDiff
 
     # @return [String]
     def report
-      diff.join
+      diff.map do |delta|
+        Report.new(path: delta.path, value: delta.left, mode: Report::Mode::DELETION).to_s +
+          Report.new(path: delta.path, value: delta.right, mode: Report::Mode::ADDITION).to_s
+      end.join
     end
 
     # @return [Array<HashDeepDiff::Delta>]
@@ -54,22 +57,20 @@ module HashDeepDiff
       comparison.map do |delta|
         # if there are nested hashes we need to compare them furter
         # if no we return difference between values (HashDeepDiff::Delta)
-        if delta.complex?
-          if delta.simple_right?
-            [
-              Delta.new(path: delta.path, value: { left: {}, right: NO_VALUE }),
-              self.class.new(NO_VALUE, delta.right, delta.path).diff,
-              self.class.new(delta.left, NO_VALUE, delta.path).diff
-            ]
-          elsif delta.simple_left?
-            [
-              Delta.new(path: delta.path, value: { left: NO_VALUE, right: {} }),
-              self.class.new(NO_VALUE, delta.right, delta.path).diff,
-              self.class.new(delta.left, NO_VALUE, delta.path).diff
-            ]
-          else
-            self.class.new(delta.left, delta.right, delta.path).diff
-          end
+        if delta.complex? && delta.simple_right?
+          [
+            Delta.new(path: delta.path, value: { left: {}, right: NO_VALUE }),
+            self.class.new(NO_VALUE, delta.right, delta.path).diff,
+            self.class.new(delta.left, NO_VALUE, delta.path).diff
+          ]
+        elsif delta.complex? && delta.simple_left?
+          [
+            Delta.new(path: delta.path, value: { left: NO_VALUE, right: {} }),
+            self.class.new(NO_VALUE, delta.right, delta.path).diff,
+            self.class.new(delta.left, NO_VALUE, delta.path).diff
+          ]
+        elsif delta.complex?
+          self.class.new(delta.left, delta.right, delta.path).diff
         else
           delta
         end
