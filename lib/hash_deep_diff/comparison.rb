@@ -66,26 +66,27 @@ module HashDeepDiff
 
     private
 
-    attr_reader :reporting_engine
+    attr_reader :reporting_engine, :delta_engine
 
     # @param [Object] left original version
     # @param [Object] right new version
     # @param [Array] prefix keys to fetch current comparison (not empty for nested comparisons)
-    def initialize(left, right, prefix = [], reporting_engine: Reports::Diff)
+    def initialize(left, right, prefix = [], reporting_engine: Reports::Diff, delta_engine: Delta)
       @left = left
       @right = right
       @path = prefix.to_ary
       @reporting_engine = reporting_engine
+      @delta_engine = delta_engine
     end
 
     # @return [Array<HashDeepDiff::Delta>]
     def comparison
-      return [Delta.new(path: path, value: { left: left, right: right })] if common_keys.empty?
+      return [delta_engine.new(path: path, value: { left: left, right: right })] if common_keys.empty?
 
       common_keys.each_with_object([]) do |key, memo|
         next if values_equal?(key)
 
-        memo << Delta.new(path: path + [key], value: { left: value_left(key), right: value_right(key) })
+        memo << delta_engine.new(path: path + [key], value: { left: value_left(key), right: value_right(key) })
       end
     end
 
@@ -94,9 +95,9 @@ module HashDeepDiff
     # @return [Array<Delta>]
     def missing_mesting(delta)
       change = if delta.simple_left?
-                 Delta.new(path: delta.path, value: { left: NO_VALUE, right: {} })
+                 delta_engine.new(path: delta.path, value: { left: NO_VALUE, right: {} })
                elsif delta.simple_right?
-                 Delta.new(path: delta.path, value: { left: {}, right: NO_VALUE })
+                 delta_engine.new(path: delta.path, value: { left: {}, right: NO_VALUE })
                end
       [
         change,
