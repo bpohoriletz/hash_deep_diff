@@ -11,12 +11,12 @@ module HashDeepDiff
   #
   # Examples:
   #   - { one: :a } compared with { one: :b } does not have nesting so we compare keys and values
-  #   - { one: { two: :a, zero: z } } compared with { one: { two: :b, three: :c } } has nesting, so is represented as
+  #   - { one: { two: :a, zero: :z } } compared with { one: { two: :b, three: :c } } has nesting, so is represented as
   #     - { two: :a } compared with { two: :b, three: :c }, as there is no more nesting we compare keys and values
   #       and have the following comparisons
   #       { one: { two: :a } } compared to { one: { two: :b } } - value was changed
   #         i.e :a vas replaced with :b on path [:one, :two]
-  #       { one: { zero: z } } compared to NO_VALUE - value was deleted
+  #       { one: { zero: :z } } compared to NO_VALUE - value was deleted
   #         i.e :z vas replaced with NO_VALUE on path [:one, :zero]
   #       NO_VALUE compared to { one: { three: :c } } compared - value was added
   #         i.e NO_VALUE vas replaced with :c on path [:one, :three]
@@ -40,7 +40,7 @@ module HashDeepDiff
     # @!attribute [r] right
     #    @return [Hash] Hash that the original is compared to
     # @!attribute [r] path
-    #    @return [Array<Object>] subset of keys from original Hashes to fetch compared Hashes
+    #    @return [Array<Object>] subset of keys from original Hashes to fetch compared values
     #    (is empty for top-level comparison)
     attr_reader :left, :right, :path
 
