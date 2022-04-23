@@ -11,9 +11,11 @@ module HashDeepDiff
   class Delta
     extend Forwardable
 
-    def_delegators :@delta, :==, :each_with_object, :each_key, :[],
+    def_delegators :to_hash, :==, :each_with_object, :each_key, :[],
                    :to_a, :empty?, :keys
-    # Returns true if we have nested Hashes
+    attr_reader :change_key
+
+    # Returns true if delta includes nested Hashes
     # @return [Bool]
     def complex?
       !simple_left? || !simple_right?
@@ -29,12 +31,6 @@ module HashDeepDiff
     # @return [Bool]
     def simple_right?
       !right.respond_to?(:to_hash)
-    end
-
-    # Keys needed to fetch values that we're comparing
-    # @return [Array]
-    def path
-      prefix + [delta.keys.first]
     end
 
     # Original value
@@ -55,20 +51,19 @@ module HashDeepDiff
 
     # @return [Hash]
     def to_hash
-      delta
+      { change_key[-1] => value }
     end
 
     private
 
-    attr_reader :delta, :prefix, :value
+    attr_reader :value
 
-    # @param [Array] path list of keys to fetch values we're comparing
+    # @param [Array] change_key list of keys to fetch values we're comparing
     # @param [Hash<(:left, :right), Object>] value +Hash+ object with two keys - :left and :right,
     #   that represents compared original value (at :left) and value we compare to (at :right)
-    def initialize(path:, value:)
-      @delta = { path[-1] => value }
+    def initialize(change_key:, value:)
       @value = value
-      @prefix = path[0..-2]
+      @change_key = change_key
     end
   end
 end
