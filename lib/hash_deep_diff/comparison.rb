@@ -51,6 +51,8 @@ module HashDeepDiff
 
     # @return [Array<HashDeepDiff::Delta>]
     def diff
+      return [] if left == right
+
       comparison.map do |delta|
         if delta.complex? && (delta.simple_right? || delta.simple_left?)
           missing_mesting(delta)
