@@ -55,9 +55,10 @@ module HashDeepDiff
 
       comparison.map do |delta|
         if delta.complex? && (delta.simple_right? || delta.simple_left?)
-          missing_mesting(delta)
+          missing_nesting(delta)
         elsif delta.complex?
-          self.class.new(delta.left, delta.right, delta.path, reporting_engine: reporting_engine).diff
+          self.class.new(delta.left, delta.right, delta.path, delta_engine: delta_engine,
+                                                              reporting_engine: reporting_engine).diff
         else
           delta
         end
@@ -93,7 +94,7 @@ module HashDeepDiff
     # if old value was a +Hash+ and new is not (or vice versa) we report +Hash+ addition/deletion
     # @param [Delta] delta
     # @return [Array<Delta>]
-    def missing_mesting(delta)
+    def missing_nesting(delta)
       change = if delta.simple_left?
                  delta_engine.new(path: delta.path, value: { left: NO_VALUE, right: {} })
                elsif delta.simple_right?
@@ -101,8 +102,10 @@ module HashDeepDiff
                end
       [
         change,
-        self.class.new(NO_VALUE, delta.right, delta.path).diff,
-        self.class.new(delta.left, NO_VALUE, delta.path).diff
+        self.class.new(NO_VALUE, delta.right, delta.path, delta_engine: delta_engine,
+                                                          reporting_engine: reporting_engine).diff,
+        self.class.new(delta.left, NO_VALUE, delta.path, delta_engine: delta_engine,
+                                                         reporting_engine: reporting_engine).diff
       ]
     end
 
