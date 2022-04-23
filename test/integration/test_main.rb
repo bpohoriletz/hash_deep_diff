@@ -2,7 +2,7 @@
 
 require 'test_helper'
 
-describe HashDeepDiff::Comparison do
+describe 'Integration tests: ' do
   describe '#diff (for one level deep hashes)' do
     it 'finds an empty hash if left quals right' do
       left, right = load_fixture('one_level/small', 'one_level/small')
