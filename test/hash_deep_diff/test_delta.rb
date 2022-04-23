@@ -17,16 +17,28 @@ describe HashDeepDiff::Delta do
       refute_predicate small, :complex?
     end
 
-    it 'is true if right part of diff includes nested hashes' do
-      assert_predicate mediumsmall, :complex?
-    end
-
-    it 'is true if left part of diff includes nested hashes' do
-      assert_predicate smallmedium, :complex?
-    end
-
     it 'is true if diff has nested hashes' do
       assert_predicate medium, :complex?
+    end
+  end
+
+  describe '#simple_right?' do
+    it 'is false if right part of diff includes nested hashes' do
+      refute_predicate mediumsmall, :simple_right?
+    end
+
+    it 'is true if right part of diff has no nested hashes' do
+      assert_predicate smallmedium, :simple_right?
+    end
+  end
+
+  describe '#simple_left?' do
+    it 'is false if left part of diff includes nested hashes' do
+      refute_predicate smallmedium, :simple_left?
+    end
+
+    it 'is true if left part of diff has no nested hashes' do
+      assert_predicate mediumsmall, :simple_left?
     end
   end
 end

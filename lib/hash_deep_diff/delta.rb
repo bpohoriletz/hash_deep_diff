@@ -34,17 +34,17 @@ module HashDeepDiff
     # Keys needed to fetch values that we're comparing
     # @return [Array]
     def path
-      @prefix + [@delta.keys.first]
+      prefix + [delta.keys.first]
     end
 
     # Original value
     def left
-      @value[:left]
+      value[:left]
     end
 
     # Value we compare to
     def right
-      @value[:right]
+      value[:right]
     end
 
     # see {#to_hash}
@@ -55,10 +55,12 @@ module HashDeepDiff
 
     # @return [Hash]
     def to_hash
-      @delta
+      delta
     end
 
     private
+
+    attr_reader :delta, :prefix, :value
 
     # @param [Array] path list of keys to fetch values we're comparing
     # @param [Hash<(:left, :right), Object>] value +Hash+ object with two keys - :left and :right,
