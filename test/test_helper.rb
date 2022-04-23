@@ -7,6 +7,7 @@ require 'minitest/spec'
 
 require 'pry'
 require 'hash_deep_diff'
+require 'naught'
 require_relative 'support/fixture'
 require_relative 'support/extensions'
 
