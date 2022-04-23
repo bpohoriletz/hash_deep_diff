@@ -8,4 +8,5 @@ require 'hash_deep_diff/comparison'
 module HashDeepDiff
   # value was not found
   NO_VALUE = Class.new(NilClass)
+  AbstractMethodError = Class.new(NoMethodError)
 end
