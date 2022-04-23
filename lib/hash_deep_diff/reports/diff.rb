@@ -5,16 +5,6 @@ module HashDeepDiff
   module Reports
     # Visual representation of the {Delta} as diff
     class Diff
-      # We have two cases
-      #   * added - when value on the left is missing
-      #   * deleted - when the value on the right is missing
-      module Mode
-        # for additions
-        ADDITION = '+left'
-        # for deletions
-        DELETION = '-left'
-      end
-
       # see {#to_str}
       # @return [String]
       def to_s
@@ -24,26 +14,12 @@ module HashDeepDiff
       # A report on additions and deletions
       # @return [String]
       def to_str
-        addition + deletion
-      end
-
-      # @return [String]
-      def addition
-        return '' if old_val == NO_VALUE
-
-        return [Mode::DELETION, diff_prefix, ' = ', old_val.to_s, "\n"].join
-      end
-
-      # @return [String]
-      def deletion
-        return '' if new_val == NO_VALUE
-
-        return [Mode::ADDITION, diff_prefix, ' = ', new_val.to_s, "\n"].join
+        original + replacement
       end
 
       private
 
-      attr_reader :old_val, :new_val
+      attr_reader :old_val, :new_val, :path
 
       # @param [Delta] delta diff to report
       def initialize(delta:)
@@ -52,11 +28,38 @@ module HashDeepDiff
         @new_val = delta.right
       end
 
+      # old value
+      # @return [String]
+      def original
+        return '' if old_val == NO_VALUE
+
+        return "#{deletion_prefix}#{diff_prefix} = #{old_val}\n"
+      end
+
+      # new value
+      # @return [String]
+      def replacement
+        return '' if new_val == NO_VALUE
+
+        return "#{addition}#{diff_prefix} = #{new_val}\n"
+      end
+
       # Visual representation of keys from compared objects needed to fetch the compared values
       # @return [String]
       def diff_prefix
-        # TOFIX poor naming
-        @path.map { |key| "[#{key}]" }.join
+        path.map { |key| "[#{key}]" }.join
+      end
+
+      # visual indication of addition
+      # @return [String]
+      def addition
+        '+left'
+      end
+
+      # visual indication of deletion
+      # @return [String]
+      def deletion_prefix
+        '-left'
       end
     end
   end
