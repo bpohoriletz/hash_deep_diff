@@ -19,11 +19,11 @@ module HashDeepDiff
 
       private
 
-      attr_reader :old_val, :new_val, :path
+      attr_reader :old_val, :new_val, :change_key
 
       # @param [Delta] delta diff to report
       def initialize(delta:)
-        @path = delta.path.to_ary
+        @change_key = delta.path.to_ary
         @old_val = delta.left
         @new_val = delta.right
       end

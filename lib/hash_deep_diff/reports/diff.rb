@@ -14,7 +14,7 @@ module HashDeepDiff
       def original
         return '' if old_val == NO_VALUE
 
-        return "#{deletion}#{fetch_path} = #{old_val}\n"
+        return "#{deletion}#{path} = #{old_val}\n"
       end
 
       # new value
@@ -22,13 +22,13 @@ module HashDeepDiff
       def replacement
         return '' if new_val == NO_VALUE
 
-        return "#{addition}#{fetch_path} = #{new_val}\n"
+        return "#{addition}#{path} = #{new_val}\n"
       end
 
       # Visual representation of keys from compared objects needed to fetch the compared values
       # @return [String]
-      def fetch_path
-        path.map { |key| "[#{key}]" }.join
+      def path
+        change_key.map { |key| "[#{key}]" }.join
       end
 
       # visual indication of addition
