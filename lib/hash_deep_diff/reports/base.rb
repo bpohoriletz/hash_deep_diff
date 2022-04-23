@@ -23,7 +23,7 @@ module HashDeepDiff
 
       # @param [Delta] delta diff to report
       def initialize(delta:)
-        @change_key = delta.path.to_ary
+        @change_key = delta.change_key.to_ary
         @old_val = delta.left
         @new_val = delta.right
       end

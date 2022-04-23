@@ -57,8 +57,8 @@ module HashDeepDiff
         if delta.complex? && (delta.simple_right? || delta.simple_left?)
           missing_nesting(delta)
         elsif delta.complex?
-          self.class.new(delta.left, delta.right, delta.path, delta_engine: delta_engine,
-                                                              reporting_engine: reporting_engine).diff
+          self.class.new(delta.left, delta.right, delta.change_key, delta_engine: delta_engine,
+                                                                    reporting_engine: reporting_engine).diff
         else
           delta
         end
@@ -82,12 +82,12 @@ module HashDeepDiff
 
     # @return [Array<HashDeepDiff::Delta>]
     def comparison
-      return [delta_engine.new(path: path, value: { left: left, right: right })] if common_keys.empty?
+      return [delta_engine.new(change_key: path, value: { left: left, right: right })] if common_keys.empty?
 
       common_keys.each_with_object([]) do |key, memo|
         next if values_equal?(key)
 
-        memo << delta_engine.new(path: path + [key], value: { left: value_left(key), right: value_right(key) })
+        memo << delta_engine.new(change_key: path + [key], value: { left: value_left(key), right: value_right(key) })
       end
     end
 
@@ -96,16 +96,16 @@ module HashDeepDiff
     # @return [Array<Delta>]
     def missing_nesting(delta)
       change = if delta.simple_left?
-                 delta_engine.new(path: delta.path, value: { left: NO_VALUE, right: {} })
+                 delta_engine.new(change_key: delta.change_key, value: { left: NO_VALUE, right: {} })
                elsif delta.simple_right?
-                 delta_engine.new(path: delta.path, value: { left: {}, right: NO_VALUE })
+                 delta_engine.new(change_key: delta.change_key, value: { left: {}, right: NO_VALUE })
                end
       [
         change,
-        self.class.new(NO_VALUE, delta.right, delta.path, delta_engine: delta_engine,
-                                                          reporting_engine: reporting_engine).diff,
-        self.class.new(delta.left, NO_VALUE, delta.path, delta_engine: delta_engine,
-                                                         reporting_engine: reporting_engine).diff
+        self.class.new(NO_VALUE, delta.right, delta.change_key, delta_engine: delta_engine,
+                                                                reporting_engine: reporting_engine).diff,
+        self.class.new(delta.left, NO_VALUE, delta.change_key, delta_engine: delta_engine,
+                                                               reporting_engine: reporting_engine).diff
       ]
     end
 

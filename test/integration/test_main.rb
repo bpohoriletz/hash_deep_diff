@@ -47,7 +47,7 @@ describe 'Integration tests: ' do
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
       assert_equal([{ g: { left: 'ggg', right: Set[1, 2] } }], diff)
-      assert_equal([[:g]], diff.map(&:path))
+      assert_equal([[:g]], diff.map(&:change_key))
     end
 
     it 'finds difference for hash with unsorted arrays' do
@@ -58,7 +58,7 @@ describe 'Integration tests: ' do
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
       assert_equal([{ c: { left: [1, 2, 3], right: [1, 3, 2] } }], diff)
-      assert_equal([[:c]], diff.map(&:path))
+      assert_equal([[:c]], diff.map(&:change_key))
     end
   end
 
@@ -72,7 +72,7 @@ describe 'Integration tests: ' do
       assert_equal(
         [{ c: { left: 'c', right: 'd' } }, { d: { left: 'd', right: HashDeepDiff::NO_VALUE } }], diff
       )
-      assert_equal([%i[b c], %i[b d]], diff.map(&:path))
+      assert_equal([%i[b c], %i[b d]], diff.map(&:change_key))
     end
 
     it 'finds difference for hash with numeric values' do
@@ -85,7 +85,7 @@ describe 'Integration tests: ' do
         [{ c: { left: 'c', right: 'd' } }, { d: { left: 'd', right: HashDeepDiff::NO_VALUE } },
          { e: { left: HashDeepDiff::NO_VALUE, right: 3 } }], diff
       )
-      assert_equal([%i[b c], %i[b d], %i[b e]], diff.map(&:path))
+      assert_equal([%i[b c], %i[b d], %i[b e]], diff.map(&:change_key))
     end
   end
 
@@ -174,7 +174,7 @@ describe 'Integration tests: ' do
          %i[h i m],
          %i[h i k],
          %i[h i l],
-         %i[h n]], diff.map(&:path)
+         %i[h n]], diff.map(&:change_key)
       )
     end
   end

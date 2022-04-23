@@ -4,7 +4,7 @@ require 'test_helper'
 
 describe HashDeepDiff::Reports::Diff do
   let(:described_class) { HashDeepDiff::Reports::Diff }
-  let(:delta) { Struct.new(:path, :left, :right) }
+  let(:delta) { Struct.new(:change_key, :left, :right) }
   let(:change) { delta.new([:a], :b, :c) }
   let(:array_change) { delta.new([:a], :b, %i[c d]) }
   let(:deletion) { delta.new([:a], :b, HashDeepDiff::NO_VALUE) }
