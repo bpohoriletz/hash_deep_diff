@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
     spec.metadata['allowed_push_host'] = 'https://rubygems.org/'
 
     spec.metadata['homepage_uri'] = spec.homepage
+    spec.metadata['documentation_uri'] = 'https://rdoc.info/gems/hash_deep_diff'
     spec.metadata['source_code_uri'] = 'https://github.com/bpohoriletz/hash_deep_diff'
     spec.metadata['changelog_uri'] = 'https://github.com/bpohoriletz/hash_deep_diff/blob/main/CHANGELOG.md'
     spec.metadata['rubygems_mfa_required'] = 'true'
