@@ -6,7 +6,6 @@ describe 'Integration tests: ' do
   describe '#diff (for one level deep hashes)' do
     it 'finds left if right is empty' do
       left, right = load_fixture('one_level/small', 'empty')
-
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
       assert_equal([{ a: { left: 'b', right: HashDeepDiff::NO_VALUE } }], diff)
@@ -101,17 +100,13 @@ describe 'Integration tests: ' do
         [{ e: { left: HashDeepDiff::NO_VALUE, right: {} } },
          { f: { left: HashDeepDiff::NO_VALUE, right: {} } },
          { g: { left: HashDeepDiff::NO_VALUE, right: [1, 2, 3] } },
-         { f: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
          { h: { left: HashDeepDiff::NO_VALUE, right: {} } },
          { i: { left: HashDeepDiff::NO_VALUE, right: {} } },
          { j: { left: HashDeepDiff::NO_VALUE, right: {} } },
          { k: { left: HashDeepDiff::NO_VALUE, right: 'k' } },
          { l: { left: HashDeepDiff::NO_VALUE, right: 'l' } },
-         { j: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
          { m: { left: HashDeepDiff::NO_VALUE, right: 'm' } },
-         { i: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
          { n: { left: HashDeepDiff::NO_VALUE, right: 'n' } },
-         { h: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
          { o: { left: HashDeepDiff::NO_VALUE, right: 'o' } },
          { p: { left: HashDeepDiff::NO_VALUE, right: [1, 2, 3] } },
          { e: { left: [1, 2, 3], right: HashDeepDiff::NO_VALUE } },
@@ -124,14 +119,9 @@ describe 'Integration tests: ' do
          { x: { left: HashDeepDiff::NO_VALUE, right: {} } },
          { y: { left: HashDeepDiff::NO_VALUE, right: {} } },
          { z: { left: HashDeepDiff::NO_VALUE, right: 'z' } },
-         { y: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
-         { x: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
-         { v: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
-         { s: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
          { f: { left: HashDeepDiff::NO_VALUE, right: {} } },
          { g: { left: HashDeepDiff::NO_VALUE, right: {} } },
          { h: { left: HashDeepDiff::NO_VALUE, right: 'j' } },
-         { g: { left: HashDeepDiff::NO_VALUE, right: HashDeepDiff::NO_VALUE } },
          { f: { left: 'f', right: HashDeepDiff::NO_VALUE } },
          { g: { left: [1, 2, 3], right: HashDeepDiff::NO_VALUE } },
          { j: { left: {}, right: HashDeepDiff::NO_VALUE } },
@@ -146,21 +136,18 @@ describe 'Integration tests: ' do
          { n: { left: 'n', right: HashDeepDiff::NO_VALUE } }],
         diff
       )
+
       assert_equal(
         [%i[b c e],
          %i[b c e f],
          %i[b c e f g],
-         %i[b c e f],
          %i[b c e h],
          %i[b c e h i],
          %i[b c e h i j],
          %i[b c e h i j k],
          %i[b c e h i j l],
-         %i[b c e h i j],
          %i[b c e h i m],
-         %i[b c e h i],
          %i[b c e h n],
-         %i[b c e h],
          %i[b c e o],
          %i[b c e p],
          %i[b c e],
@@ -173,14 +160,9 @@ describe 'Integration tests: ' do
          %i[b c s v x],
          %i[b c s v x y],
          %i[b c s v x y z],
-         %i[b c s v x y],
-         %i[b c s v x],
-         %i[b c s v],
-         %i[b c s],
          [:f],
          %i[f g],
          %i[f g h],
-         %i[f g],
          [:f],
          [:g],
          %i[h i j],
