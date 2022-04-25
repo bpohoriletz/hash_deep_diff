@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'delta'
-
 module HashDeepDiff
   # Representation of the recursive difference between two hashes
   # main parts are
@@ -83,7 +81,7 @@ module HashDeepDiff
     end
 
     def nested_comparison(delta)
-      if delta.complex?
+      if delta.full?
         next_comparison(delta)
       elsif delta.partial?
         [
