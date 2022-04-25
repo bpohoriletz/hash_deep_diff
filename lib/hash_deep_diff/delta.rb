@@ -28,12 +28,12 @@ module HashDeepDiff
     # true if at least one of the values is a Hash
     # @return [Bool]
     def partial?
-      !complex? && !simple?
+      !full? && !simple?
     end
 
     # true if both valus are Hashes
     # @return [Bool]
-    def complex?
+    def full?
       !simple_left? && !simple_right?
     end
 
