@@ -54,7 +54,7 @@ module HashDeepDiff
       return [] if left == right
 
       comparison.map do |delta|
-        if delta.complex? && (delta.simple_right? || delta.simple_left?)
+        if delta.partial?
           missing_nesting(delta)
         elsif delta.complex?
           self.class.new(delta.left, delta.right, delta.change_key, delta_engine: delta_engine,
@@ -95,18 +95,13 @@ module HashDeepDiff
     # @param [Delta] delta
     # @return [Array<Delta>]
     def missing_nesting(delta)
-      change = if delta.simple_left?
-                 delta_engine.new(change_key: delta.change_key, value: { left: NO_VALUE, right: {} })
-               elsif delta.simple_right?
-                 delta_engine.new(change_key: delta.change_key, value: { left: {}, right: NO_VALUE })
-               end
       [
-        change,
+        delta.placebo,
         self.class.new(NO_VALUE, delta.right, delta.change_key, delta_engine: delta_engine,
                                                                 reporting_engine: reporting_engine).diff,
         self.class.new(delta.left, NO_VALUE, delta.change_key, delta_engine: delta_engine,
                                                                reporting_engine: reporting_engine).diff
-      ]
+      ].compact
     end
 
     # @param [Object] key the key which value we're currently comparing
