@@ -30,13 +30,13 @@ describe HashDeepDiff::Delta do
     end
   end
 
-  describe '#full?' do
+  describe '#composite?' do
     it 'is false if diff does not include nested hashes' do
-      refute_predicate small, :full?
+      refute_predicate small, :composite?
     end
 
     it 'is true if diff has nested hashes' do
-      assert_predicate medium, :full?
+      assert_predicate medium, :composite?
     end
   end
 

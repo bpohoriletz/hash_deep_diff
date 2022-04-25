@@ -46,7 +46,7 @@ module HashDeepDiff
     attr_reader :left, :right, :path
     attr_reader :reporting_engine, :delta_engine
 
-    def_delegators :factory, :next_comparison
+    def_delegators :comparison_factory, :comparison
 
     # @return [String]
     def report
@@ -57,7 +57,7 @@ module HashDeepDiff
     def diff
       return [] if left == right
 
-      comparison.map { |delta| delta.simple? ? delta : nested_comparison(delta) }.flatten
+      deltas.map { |delta| delta.simple? ? delta : inward_comparison(delta) }.flatten
     end
 
     private
@@ -74,7 +74,7 @@ module HashDeepDiff
     end
 
     # @return [Array<HashDeepDiff::Delta>]
-    def comparison
+    def deltas
       return [delta_engine.new(change_key: path, value: { left: left, right: right })] if common_keys.empty?
 
       common_keys.each_with_object([]) do |key, memo|
@@ -85,16 +85,16 @@ module HashDeepDiff
     end
 
     # depending on circumstances will return necessary comparisons
-    # @return [Object]
-    def nested_comparison(delta)
-      if delta.full?
-        next_comparison(delta: delta).diff
+    # @return [Array<HashDeepDiff::Delta>]
+    def inward_comparison(delta)
+      if delta.composite?
+        comparison(delta: delta).diff
       elsif delta.partial?
         [
           delta.placebo,
-          next_comparison(delta: delta, modifier: :right).diff,
-          next_comparison(delta: delta, modifier: :left).diff
-        ].compact
+          comparison(delta: delta, modifier: :right).diff,
+          comparison(delta: delta, modifier: :left).diff
+        ].compact.flatten
       end
     end
 
@@ -129,8 +129,8 @@ module HashDeepDiff
     end
 
     # @return [HashDeepDiff::Factories::Comparison]
-    def factory
-      HashDeepDiff::Factories::Comparison.new(comparison: self)
+    def comparison_factory
+      HashDeepDiff::Factories::Comparison.new(reporting_engine: reporting_engine)
     end
   end
 end
