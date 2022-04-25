@@ -43,7 +43,6 @@ module HashDeepDiff
     # @!attribute [r] path
     #    @return [Array<Object>] subset of keys from original Hashes to fetch compared values
     #    (is empty for top-level comparison)
-    attr_reader :left, :right, :path
     attr_reader :reporting_engine, :delta_engine
 
     def_delegators :comparison_factory, :comparison
@@ -57,17 +56,35 @@ module HashDeepDiff
     def diff
       return [] if left == right
 
-      deltas.map { |delta| delta.simple? ? delta : inward_comparison(delta) }.flatten
+      deltas.flat_map { |new_delta| new_delta.simple? ? new_delta : inward_comparison(new_delta) }
+    end
+
+    # @param [Object] key the key which value we're currently comparing
+    def left(key = NO_VALUE)
+      return NO_VALUE if @left == NO_VALUE
+      return @left if key == NO_VALUE
+
+      @left[key] || NO_VALUE
+    end
+
+    # @param [Object] key the key which value we're currently comparing
+    def right(key = NO_VALUE)
+      return NO_VALUE if @right == NO_VALUE
+      return @right if key == NO_VALUE
+
+      @right[key] || NO_VALUE
     end
 
     private
 
-    # @param [Object] left original version
-    # @param [Object] right new version
+    attr_reader :path
+
+    # @param [Object] original original version
+    # @param [Object] changed new version
     # @param [Array] prefix keys to fetch current comparison (not empty for nested comparisons)
-    def initialize(left, right, prefix = [], reporting_engine: Reports::Diff, delta_engine: Delta)
-      @left = left
-      @right = right
+    def initialize(original, changed, prefix = [], reporting_engine: Reports::Diff, delta_engine: Delta)
+      @left = original
+      @right = changed
       @path = prefix.to_ary
       @reporting_engine = reporting_engine
       @delta_engine = delta_engine
@@ -75,12 +92,12 @@ module HashDeepDiff
 
     # @return [Array<HashDeepDiff::Delta>]
     def deltas
-      return [delta_engine.new(change_key: path, value: { left: left, right: right })] if common_keys.empty?
+      return [delta] if common_keys.empty?
 
       common_keys.each_with_object([]) do |key, memo|
         next if values_equal?(key)
 
-        memo << delta_engine.new(change_key: path + [key], value: { left: value_left(key), right: value_right(key) })
+        memo << delta(key: key)
       end
     end
 
@@ -101,21 +118,7 @@ module HashDeepDiff
     # @param [Object] key the key which value we're currently comparing
     # @return [Bool]
     def values_equal?(key)
-      value_right(key).instance_of?(value_left(key).class) && (value_right(key) == value_left(key))
-    end
-
-    # @param [Object] key the key which value we're currently comparing
-    def value_left(key)
-      return NO_VALUE if left == NO_VALUE
-
-      left[key] || NO_VALUE
-    end
-
-    # @param [Object] key the key which value we're currently comparing
-    def value_right(key)
-      return NO_VALUE if right == NO_VALUE
-
-      right[key] || NO_VALUE
+      right(key).instance_of?(left(key).class) && (right(key) == left(key))
     end
 
     # All keys from both original and compared objects
@@ -131,6 +134,15 @@ module HashDeepDiff
     # @return [HashDeepDiff::Factories::Comparison]
     def comparison_factory
       HashDeepDiff::Factories::Comparison.new(reporting_engine: reporting_engine)
+    end
+
+    # factory function
+    # @return [HashDeepDiff::Delta]
+    def delta(key: NO_VALUE)
+      change_key = path
+      change_key += [key] unless key == NO_VALUE
+
+      HashDeepDiff::Delta.new(change_key: change_key, value: { left: left(key), right: right(key) })
     end
   end
 end
