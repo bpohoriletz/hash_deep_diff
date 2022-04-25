@@ -36,8 +36,19 @@ HashDeepDiff::Comparison.new(left, right).report
 - left[a] = a
 + left[a] = b
 ```
-please see [Documentation](https://rdoc.info/gems/hash_deep_diff) for
-more info
+please see [Documentation](https://rdoc.info/gems/hash_deep_diff/HashDeepDiff/Comparison) for
+more information 
+
+## Customization
+
+You can implement and use your own reporting engines with the default `HashDeepDiff::Delta` objects as a source of the report. In order to do so implement your own version of the reporting engine (example can be found [here](https://github.com/bpohoriletz/hash_deep_diff/tree/main/lib/hash_deep_diff/reports)) and inject it into a `Comparison`
+
+```ruby
+left = { a: :a }
+right = { a: :b }
+
+HashDeepDiff::Comparison.new(left, right, reporting_engine: CustomEngine).report
+```
 
 ## Contributing
 
