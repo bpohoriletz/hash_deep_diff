@@ -10,4 +10,6 @@ module HashDeepDiff
   NO_VALUE = Class.new(NilClass)
   # Abstract method
   AbstractMethodError = Class.new(NoMethodError)
+  # Any error
+  Error = Class.new(StandardError)
 end
