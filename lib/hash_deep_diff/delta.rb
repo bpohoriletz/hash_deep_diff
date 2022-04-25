@@ -15,22 +15,22 @@ module HashDeepDiff
                    :to_a, :empty?, :keys
     attr_reader :change_key
 
-    # Returns true if delta includes nested Hashes
+    # true if both valus are Hashes
     # @return [Bool]
     def complex?
+      !simple_left? && !simple_right?
+    end
+
+    # true if at least one of the values is a Hash
+    # @return [Bool]
+    def partial?
       !simple_left? || !simple_right?
     end
 
-    # Returns true if left value has no nested Hashes
+    # true if none of the values is a Hash
     # @return [Bool]
-    def simple_left?
-      !left.respond_to?(:to_hash)
-    end
-
-    # Returns true if right value has no nested Hashes
-    # @return [Bool]
-    def simple_right?
-      !right.respond_to?(:to_hash)
+    def simple?
+      simple_left? && simple_right?
     end
 
     # Original value
@@ -64,6 +64,18 @@ module HashDeepDiff
     def initialize(change_key:, value:)
       @value = value
       @change_key = change_key
+    end
+
+    # Returns true if left value has no nested Hashes
+    # @return [Bool]
+    def simple_left?
+      !left.respond_to?(:to_hash)
+    end
+
+    # Returns true if right value has no nested Hashes
+    # @return [Bool]
+    def simple_right?
+      !right.respond_to?(:to_hash)
     end
   end
 end
