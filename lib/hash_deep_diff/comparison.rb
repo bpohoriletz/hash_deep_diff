@@ -53,16 +53,7 @@ module HashDeepDiff
     def diff
       return [] if left == right
 
-      comparison.map do |delta|
-        if delta.partial?
-          missing_nesting(delta)
-        elsif delta.complex?
-          self.class.new(delta.left, delta.right, delta.change_key, delta_engine: delta_engine,
-                                                                    reporting_engine: reporting_engine).diff
-        else
-          delta
-        end
-      end.flatten
+      comparison.map { |delta| delta.simple? ? delta : nested_comparison(delta) }.flatten
     end
 
     private
@@ -91,17 +82,34 @@ module HashDeepDiff
       end
     end
 
-    # if old value was a +Hash+ and new is not (or vice versa) we report +Hash+ addition/deletion
-    # @param [Delta] delta
-    # @return [Array<Delta>]
-    def missing_nesting(delta)
-      [
-        delta.placebo,
-        self.class.new(NO_VALUE, delta.right, delta.change_key, delta_engine: delta_engine,
-                                                                reporting_engine: reporting_engine).diff,
+    def nested_comparison(delta)
+      if delta.complex?
+        next_comparison(delta)
+      elsif delta.partial?
+        [
+          delta.placebo,
+          next_comparison(delta, modifier: :right),
+          next_comparison(delta, modifier: :left)
+        ].compact
+      end
+    end
+
+    # factory function
+    # @return [Comparison]
+    def next_comparison(delta, modifier: nil)
+      case modifier
+      when nil
+        self.class.new(delta.left, delta.right, delta.change_key, delta_engine: delta_engine,
+                                                                  reporting_engine: reporting_engine).diff
+      when :left
         self.class.new(delta.left, NO_VALUE, delta.change_key, delta_engine: delta_engine,
                                                                reporting_engine: reporting_engine).diff
-      ].compact
+      when :right
+        self.class.new(NO_VALUE, delta.right, delta.change_key, delta_engine: delta_engine,
+                                                                reporting_engine: reporting_engine).diff
+      else
+        raise Error, "Unknown modifier #{modifier}"
+      end
     end
 
     # @param [Object] key the key which value we're currently comparing
