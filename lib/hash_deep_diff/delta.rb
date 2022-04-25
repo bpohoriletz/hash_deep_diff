@@ -15,16 +15,26 @@ module HashDeepDiff
                    :to_a, :empty?, :keys
     attr_reader :change_key
 
-    # true if both valus are Hashes
-    # @return [Bool]
-    def complex?
-      !simple_left? && !simple_right?
+    # an indication that nested Hash was deleted/added
+    # @return [HashDeepDiff::Delta, NilClass]
+    def placebo
+      return nil unless partial?
+
+      placebo = simple_left? ? { left: NO_VALUE, right: {} } : { left: {}, right: NO_VALUE }
+
+      self.class.new(change_key: change_key, value: placebo)
     end
 
     # true if at least one of the values is a Hash
     # @return [Bool]
     def partial?
-      !simple_left? || !simple_right?
+      !complex? && !simple?
+    end
+
+    # true if both valus are Hashes
+    # @return [Bool]
+    def complex?
+      !simple_left? && !simple_right?
     end
 
     # true if none of the values is a Hash

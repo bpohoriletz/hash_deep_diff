@@ -12,6 +12,24 @@ describe HashDeepDiff::Delta do
                                                      right: load_fixture('two_level/small') })
   end
 
+  describe '#placebo' do
+    it 'is empty for simple deltas' do
+      assert_nil(small.placebo)
+    end
+
+    it 'is empty for complex deltas' do
+      assert_nil(big.placebo)
+    end
+
+    it 'is empty left for added nesting' do
+      assert_equal({ 'a' => { left: HashDeepDiff::NO_VALUE, right: {} } }, mediumsmall.placebo)
+    end
+
+    it 'is empty right for added nesting' do
+      assert_equal({ 'a' => { right: HashDeepDiff::NO_VALUE, left: {} } }, smallmedium.placebo)
+    end
+  end
+
   describe '#complex?' do
     it 'is false if diff does not include nested hashes' do
       refute_predicate small, :complex?
