@@ -49,7 +49,7 @@ module HashDeepDiff
 
     # @return [String]
     def report
-      diff.map { |delta| reporting_engine.new(delta: delta).to_s }.join
+      diff.map { |simple_delta| reporting_engine.new(delta: simple_delta).to_s }.join
     end
 
     # @return [Array<HashDeepDiff::Delta>]
@@ -90,6 +90,7 @@ module HashDeepDiff
       @delta_engine = delta_engine
     end
 
+    # {Comparison} broken down into array of {Delta}
     # @return [Array<HashDeepDiff::Delta>]
     def deltas
       return [delta] if common_keys.empty?
@@ -103,15 +104,16 @@ module HashDeepDiff
 
     # depending on circumstances will return necessary comparisons
     # @return [Array<HashDeepDiff::Delta>]
-    def inward_comparison(delta)
-      if delta.composite?
-        comparison(delta: delta).diff
-      elsif delta.partial?
+    def inward_comparison(complex_delta)
+      if complex_delta.partial?
         [
-          delta.placebo,
-          comparison(delta: delta, modifier: :right).diff,
-          comparison(delta: delta, modifier: :left).diff
+          complex_delta.placebo,
+          comparison(delta: complex_delta, modifier: :right).diff,
+          comparison(delta: complex_delta, modifier: :left).diff
         ].compact.flatten
+        # TOFIX add test an drop flatten
+      else
+        comparison(delta: complex_delta).diff
       end
     end
 
