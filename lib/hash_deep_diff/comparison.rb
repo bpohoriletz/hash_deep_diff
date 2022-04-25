@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'factories/comparison'
+
 module HashDeepDiff
   # Representation of the recursive difference between two hashes
   # main parts are
@@ -33,6 +35,7 @@ module HashDeepDiff
   #     @value={:left=>HashDeepDiff::NO_VALUE, :right=>:c}>
   #  ]
   class Comparison
+    extend Forwardable
     # @!attribute [r] left
     #    @return [Hash] original version of the Hash
     # @!attribute [r] right
@@ -41,6 +44,9 @@ module HashDeepDiff
     #    @return [Array<Object>] subset of keys from original Hashes to fetch compared values
     #    (is empty for top-level comparison)
     attr_reader :left, :right, :path
+    attr_reader :reporting_engine, :delta_engine
+
+    def_delegators :factory, :next_comparison
 
     # @return [String]
     def report
@@ -55,8 +61,6 @@ module HashDeepDiff
     end
 
     private
-
-    attr_reader :reporting_engine, :delta_engine
 
     # @param [Object] left original version
     # @param [Object] right new version
@@ -80,33 +84,17 @@ module HashDeepDiff
       end
     end
 
+    # depending on circumstances will return necessary comparisons
+    # @return [Object]
     def nested_comparison(delta)
       if delta.full?
-        next_comparison(delta)
+        next_comparison(delta: delta).diff
       elsif delta.partial?
         [
           delta.placebo,
-          next_comparison(delta, modifier: :right),
-          next_comparison(delta, modifier: :left)
+          next_comparison(delta: delta, modifier: :right).diff,
+          next_comparison(delta: delta, modifier: :left).diff
         ].compact
-      end
-    end
-
-    # factory function
-    # @return [Comparison]
-    def next_comparison(delta, modifier: nil)
-      case modifier
-      when nil
-        self.class.new(delta.left, delta.right, delta.change_key, delta_engine: delta_engine,
-                                                                  reporting_engine: reporting_engine).diff
-      when :left
-        self.class.new(delta.left, NO_VALUE, delta.change_key, delta_engine: delta_engine,
-                                                               reporting_engine: reporting_engine).diff
-      when :right
-        self.class.new(NO_VALUE, delta.right, delta.change_key, delta_engine: delta_engine,
-                                                                reporting_engine: reporting_engine).diff
-      else
-        raise Error, "Unknown modifier #{modifier}"
       end
     end
 
@@ -138,6 +126,11 @@ module HashDeepDiff
       keys += right.keys if right.respond_to?(:keys)
 
       keys.uniq
+    end
+
+    # @return [HashDeepDiff::Factories::Comparison]
+    def factory
+      HashDeepDiff::Factories::Comparison.new(comparison: self)
     end
   end
 end
