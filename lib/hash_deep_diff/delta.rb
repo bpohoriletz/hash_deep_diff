@@ -16,13 +16,13 @@ module HashDeepDiff
     attr_reader :change_key
 
     # an indication that nested Hash was deleted/added
-    # @return [HashDeepDiff::Delta, NilClass]
+    # @return [Array<HashDeepDiff::Delta>]
     def placebo
-      return nil unless partial?
+      return [] unless partial?
 
       placebo = simple_left? ? { left: NO_VALUE, right: {} } : { left: {}, right: NO_VALUE }
 
-      self.class.new(change_key: change_key, value: placebo)
+      [self.class.new(change_key: change_key, value: placebo)]
     end
 
     # true if at least one of the values is a Hash

@@ -14,19 +14,19 @@ describe HashDeepDiff::Delta do
 
   describe '#placebo' do
     it 'is empty for simple deltas' do
-      assert_nil(small.placebo)
+      assert_empty(small.placebo)
     end
 
     it 'is empty for complex deltas' do
-      assert_nil(big.placebo)
+      assert_empty(big.placebo)
     end
 
     it 'is empty left for added nesting' do
-      assert_equal({ 'a' => { left: HashDeepDiff::NO_VALUE, right: {} } }, mediumsmall.placebo)
+      assert_equal([{ 'a' => { left: HashDeepDiff::NO_VALUE, right: {} } }], mediumsmall.placebo)
     end
 
     it 'is empty right for added nesting' do
-      assert_equal({ 'a' => { right: HashDeepDiff::NO_VALUE, left: {} } }, smallmedium.placebo)
+      assert_equal([{ 'a' => { right: HashDeepDiff::NO_VALUE, left: {} } }], smallmedium.placebo)
     end
   end
 
