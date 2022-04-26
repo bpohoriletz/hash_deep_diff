@@ -106,12 +106,9 @@ module HashDeepDiff
     # @return [Array<HashDeepDiff::Delta>]
     def inward_comparison(complex_delta)
       if complex_delta.partial?
-        [
-          complex_delta.placebo,
-          comparison(delta: complex_delta, modifier: :addition).diff,
+        complex_delta.placebo +
+          comparison(delta: complex_delta, modifier: :addition).diff +
           comparison(delta: complex_delta, modifier: :deletion).diff
-        ].compact.flatten
-        # TOFIX add test an drop flatten
       else
         comparison(delta: complex_delta).diff
       end
