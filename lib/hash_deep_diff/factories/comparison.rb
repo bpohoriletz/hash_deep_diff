@@ -17,11 +17,11 @@ module HashDeepDiff
 
         case modifier
         when nil
-          full_compare
-        when :left
-          compare_left
-        when :right
-          compare_right
+          inward_comparison
+        when :deletion
+          compare_original_no_nothing
+        when :addition
+          compare_changed_to_nothing
         end
       end
 
@@ -34,21 +34,21 @@ module HashDeepDiff
       end
 
       # compare two hashes
-      def full_compare
+      def inward_comparison
         HashDeepDiff::Comparison.new(left, right, change_key,
                                      delta_engine: delta.class,
                                      reporting_engine: reporting_engine)
       end
 
       # compare Hash with nothing (deletion)
-      def compare_left
+      def compare_original_no_nothing
         HashDeepDiff::Comparison.new(left, NO_VALUE, change_key,
                                      delta_engine: delta.class,
                                      reporting_engine: reporting_engine)
       end
 
       # compare nothing with Hash (addition)
-      def compare_right
+      def compare_changed_to_nothing
         HashDeepDiff::Comparison.new(NO_VALUE, right, change_key,
                                      delta_engine: delta.class,
                                      reporting_engine: reporting_engine)
