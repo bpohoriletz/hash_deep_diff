@@ -108,8 +108,8 @@ module HashDeepDiff
       if complex_delta.partial?
         [
           complex_delta.placebo,
-          comparison(delta: complex_delta, modifier: :right).diff,
-          comparison(delta: complex_delta, modifier: :left).diff
+          comparison(delta: complex_delta, modifier: :addition).diff,
+          comparison(delta: complex_delta, modifier: :deletion).diff
         ].compact.flatten
         # TOFIX add test an drop flatten
       else
