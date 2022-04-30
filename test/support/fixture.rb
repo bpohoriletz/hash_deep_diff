@@ -11,7 +11,7 @@ module Support
     end
 
     def read
-      YAML.safe_load(File.read(filename), symbolize_names: true)
+      YAML.safe_load(File.read(filename), permitted_classes: [Symbol], symbolize_names: true)
     end
 
     private
