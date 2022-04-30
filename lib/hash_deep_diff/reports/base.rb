@@ -19,6 +19,13 @@ module HashDeepDiff
 
       private
 
+      # @!attribute [r] old_val
+      #    @return [Object] original value
+      # @!attribute [r] new_val
+      #    @return [Object] replacement of the original value
+      # @!attribute [r] change_key
+      #    @return [Array<Object>] subset of keys from original Hashes to fetch reported values
+      #    (is empty for top-level comparison)
       attr_reader :old_val, :new_val, :change_key
 
       # @param [Delta] delta diff to report
