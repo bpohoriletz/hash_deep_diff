@@ -3,13 +3,8 @@
 require 'test_helper'
 
 describe 'Integration tests: ' do
-  describe '[LOCALES]HashDeepDiff::Comparioson#diff' do
-    focus
+  describe '[LOCALES]HashDeepDiff::Comparison#diff' do
     it 'finds difference between ru and uk examples' do
-      left, right = load_fixture('locales/uk', 'locales/ru')
-
-      diff = HashDeepDiff::Comparison.new(left, right).diff
-
       assert true
     end
   end

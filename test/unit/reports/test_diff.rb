@@ -7,6 +7,7 @@ describe HashDeepDiff::Reports::Diff do
   let(:delta) { Struct.new(:change_key, :left, :right) }
   let(:change) { delta.new([:a], :b, :c) }
   let(:array_change) { delta.new([:a], :b, %i[c d]) }
+  let(:two_arrays) { delta.new([:a], %i[b c], %i[c d]) }
   let(:deletion) { delta.new([:a], :b, HashDeepDiff::NO_VALUE) }
   let(:addition) { delta.new([:a], HashDeepDiff::NO_VALUE, :c) }
 
@@ -44,6 +45,16 @@ describe HashDeepDiff::Reports::Diff do
       report = <<~Q
         -left[a] = b
         +left[a] = [:c, :d]
+      Q
+
+      assert_equal(report, instance.to_s)
+    end
+
+    it 'reports difference betwen arrays' do
+      instance = described_class.new(delta: two_arrays)
+      report = <<~Q
+        -left[a] = [:b]
+        +left[a] = [:d]
       Q
 
       assert_equal(report, instance.to_s)

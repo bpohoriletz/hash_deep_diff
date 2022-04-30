@@ -3,8 +3,8 @@
 require 'test_helper'
 
 describe 'Integration tests: ' do
-  describe '[TRIVIAL]HashDeepDiff::Comparioson#diff' do
-    it 'finds difference between smal and empty hashes' do
+  describe '[TRIVIAL]HashDeepDiff::Comparison#diff' do
+    it 'finds difference between small and empty hashes' do
       left, right = load_fixture('one_level/small', 'empty')
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
