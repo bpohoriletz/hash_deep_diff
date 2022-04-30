@@ -13,16 +13,31 @@ module HashDeepDiff
       # @return [String]
       def original
         return '' if old_val == NO_VALUE
+        return "#{deletion}#{path} = #{old_val}\n" if primitive?
+        return "#{deletion}#{path} = #{old_val.sort - new_val.sort}\n" if array_to_array?
 
-        return "#{deletion}#{path} = #{old_val}\n"
+        raise Error, 'Unexpected Delta'
       end
 
       # new value
       # @return [String]
       def replacement
         return '' if new_val == NO_VALUE
+        return "#{addition}#{path} = #{new_val}\n" if primitive?
+        return "#{addition}#{path} = #{new_val.sort - old_val.sort}\n" if array_to_array?
 
-        return "#{addition}#{path} = #{new_val}\n"
+        raise Error, 'Unexpected Delta'
+      end
+
+      # returns true if left, right or both are primitive
+      # and there is no need to buld diff before reporting
+      # @return Bool
+      def primitive?
+        !array_to_array?
+      end
+
+      def array_to_array?
+        old_val.instance_of?(Array) && new_val.instance_of?(Array)
       end
 
       # Visual representation of keys from compared objects needed to fetch the compared values
