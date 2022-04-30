@@ -11,7 +11,7 @@ module HashDeepDiff
       def_delegators :delta, :left, :right, :change_key
 
       # factory function
-      # @return [Comparison]
+      # @return [HashDeepDiff::Comparison]
       def comparison(delta:, modifier: nil)
         @delta = delta
 
@@ -27,6 +27,10 @@ module HashDeepDiff
 
       private
 
+      # @!attribute [r] reporting_engine
+      #    @return [HashDeepDiff::Reports::Base] descendant of
+      # @!attribute [r] delta
+      #    @return [HashDeepDiff::Delta]
       attr_reader :reporting_engine, :delta
 
       def initialize(reporting_engine:)
@@ -34,6 +38,7 @@ module HashDeepDiff
       end
 
       # compare two hashes
+      # @return [HashDeepDiff::Comparison]
       def inward_comparison
         HashDeepDiff::Comparison.new(left, right, change_key,
                                      delta_engine: delta.class,
@@ -41,6 +46,7 @@ module HashDeepDiff
       end
 
       # compare Hash with nothing (deletion)
+      # @return [HashDeepDiff::Comparison]
       def compare_original_no_nothing
         HashDeepDiff::Comparison.new(left, NO_VALUE, change_key,
                                      delta_engine: delta.class,
@@ -48,6 +54,7 @@ module HashDeepDiff
       end
 
       # compare nothing with Hash (addition)
+      # @return [HashDeepDiff::Comparison]
       def compare_changed_to_nothing
         HashDeepDiff::Comparison.new(NO_VALUE, right, change_key,
                                      delta_engine: delta.class,

@@ -9,34 +9,27 @@ module HashDeepDiff
     class Diff < Base
       private
 
-      # old value
+      # line of the report with deleted value
       # @return [String]
       def original
         return '' if old_val == NO_VALUE
-        return "#{deletion}#{path} = #{old_val}\n" if primitive?
-        return "#{deletion}#{path} = #{old_val.sort - new_val.sort}\n" if array_to_array?
+        return "#{deletion}#{path} = #{old_val.sort - new_val.sort}\n" if array_with_array?
 
-        raise Error, 'Unexpected Delta'
+        return "#{deletion}#{path} = #{old_val}\n"
       end
 
-      # new value
+      # line of the report with added value
       # @return [String]
       def replacement
         return '' if new_val == NO_VALUE
-        return "#{addition}#{path} = #{new_val}\n" if primitive?
-        return "#{addition}#{path} = #{new_val.sort - old_val.sort}\n" if array_to_array?
+        return "#{addition}#{path} = #{new_val.sort - old_val.sort}\n" if array_with_array?
 
-        raise Error, 'Unexpected Delta'
+        return "#{addition}#{path} = #{new_val}\n"
       end
 
-      # returns true if left, right or both are primitive
-      # and there is no need to buld diff before reporting
+      # returns true if original value and replacement are instances of +Array+
       # @return Bool
-      def primitive?
-        !array_to_array?
-      end
-
-      def array_to_array?
+      def array_with_array?
         old_val.instance_of?(Array) && new_val.instance_of?(Array)
       end
 
