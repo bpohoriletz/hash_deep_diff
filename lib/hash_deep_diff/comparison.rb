@@ -98,8 +98,8 @@ module HashDeepDiff
       common_keys.each_with_object([]) do |key, memo|
         next if values_equal?(key)
 
-        memo << delta(key: key)
-      end
+        memo.append(delta(key: key))
+      end.flatten
     end
 
     # depending on circumstances will return necessary comparisons
@@ -110,6 +110,10 @@ module HashDeepDiff
           comparison(delta: complex_delta, modifier: :addition).diff +
           comparison(delta: complex_delta, modifier: :deletion).diff
       else
+        # if primitive
+        # if both arrays
+        # if left array with hashes
+        # if right array with hases
         comparison(delta: complex_delta).diff
       end
     end
