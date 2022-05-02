@@ -1,27 +1,22 @@
 # frozen_string_literal: true
 
-require 'forwardable'
-
 module HashDeepDiff
   # factories
   module Factories
     # Factory for {HashDeepDiff::Comparison}
     class Comparison
-      extend Forwardable
-      def_delegators :delta, :left, :right, :change_key
-
       # factory function
       # @return [HashDeepDiff::Comparison]
-      def comparison(delta:, modifier: nil)
-        @delta = delta
-
+      def comparison(delta:, modifier: :change)
         case modifier
-        when nil
-          inward_comparison
+        when :change
+          inward_comparison(delta)
         when :deletion
-          compare_original_no_nothing
+          compare_original_no_nothing(delta)
         when :addition
-          compare_changed_to_nothing
+          compare_nothing_to_changed(delta)
+        else
+          raise Error, 'Unknown modifier'
         end
       end
 
@@ -39,24 +34,24 @@ module HashDeepDiff
 
       # compare two hashes
       # @return [HashDeepDiff::Comparison]
-      def inward_comparison
-        HashDeepDiff::Comparison.new(left, right, change_key,
+      def inward_comparison(delta)
+        HashDeepDiff::Comparison.new(delta.left, delta.right, delta.change_key,
                                      delta_engine: delta.class,
                                      reporting_engine: reporting_engine)
       end
 
       # compare Hash with nothing (deletion)
       # @return [HashDeepDiff::Comparison]
-      def compare_original_no_nothing
-        HashDeepDiff::Comparison.new(left, NO_VALUE, change_key,
+      def compare_original_no_nothing(delta)
+        HashDeepDiff::Comparison.new(delta.left, NO_VALUE, delta.change_key,
                                      delta_engine: delta.class,
                                      reporting_engine: reporting_engine)
       end
 
       # compare nothing with Hash (addition)
       # @return [HashDeepDiff::Comparison]
-      def compare_changed_to_nothing
-        HashDeepDiff::Comparison.new(NO_VALUE, right, change_key,
+      def compare_nothing_to_changed(delta)
+        HashDeepDiff::Comparison.new(NO_VALUE, delta.right, delta.change_key,
                                      delta_engine: delta.class,
                                      reporting_engine: reporting_engine)
       end
