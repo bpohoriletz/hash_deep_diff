@@ -79,13 +79,15 @@ module HashDeepDiff
     # Returns true if left value has no nested Hashes
     # @return [Bool]
     def simple_left?
-      !left.respond_to?(:to_hash)
+      !(left.respond_to?(:to_hash) ||
+          (left.respond_to?(:to_ary) && left.any? { |el| el.respond_to?(:to_hash) }))
     end
 
     # Returns true if right value has no nested Hashes
     # @return [Bool]
     def simple_right?
-      !right.respond_to?(:to_hash)
+      !(right.respond_to?(:to_hash) ||
+        (right.respond_to?(:to_ary) && right.any? { |el| el.respond_to?(:to_hash) }))
     end
   end
 end
