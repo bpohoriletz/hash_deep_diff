@@ -76,26 +76,36 @@ module HashDeepDiff
       @change_key = change_key
     end
 
-    # Returns true if left value has no nested Hashes
-    # @return [Bool]
-    def simple_left?
-      !(left.respond_to?(:to_hash) ||
-          (left.respond_to?(:to_ary) && left.any? { |el| el.respond_to?(:to_hash) }))
-    end
-
-    # Returns true if right value has no nested Hashes
-    # @return [Bool]
-    def simple_right?
-      !(right.respond_to?(:to_hash) ||
-        (right.respond_to?(:to_ary) && right.any? { |el| el.respond_to?(:to_hash) }))
-    end
-
     # an indication of added/removed nested Hash
     # @return [Array, Hash]
     def placebo_elment
-      return [{}] if right.respond_to?(:to_ary) || left.respond_to?(:to_ary)
+      return [{}] if complex_left? || complex_right?
 
       return {}
+    end
+
+    # true if left value has no nested Hashes
+    # @return [Bool]
+    def simple_left?
+      !left.respond_to?(:to_hash) && !complex_left?
+    end
+
+    # true if right value has no nested Hashes
+    # @return [Bool]
+    def simple_right?
+      !right.respond_to?(:to_hash) && !complex_right?
+    end
+
+    # true if right part is an +Array+ with hashes
+    # @return [Bool]
+    def complex_right?
+      right.respond_to?(:to_ary) && right.any? { |el| el.respond_to?(:to_hash) }
+    end
+
+    # true if left part is an +Array+ with hashes
+    # @return [Bool]
+    def complex_left?
+      left.respond_to?(:to_ary) && left.any? { |el| el.respond_to?(:to_hash) }
     end
   end
 end

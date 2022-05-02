@@ -5,7 +5,7 @@ require 'test_helper'
 describe 'Integration tests: ' do
   describe '[BIG]HashDeepDiff::Comparison#diff' do
     let(:expectation) do
-      [{ e: { left: HashDeepDiff::NO_VALUE, right: [{}] } },
+      [{ e: { left: HashDeepDiff::NO_VALUE, right: {} } },
        { f: { left: HashDeepDiff::NO_VALUE, right: {} } },
        { g: { left: HashDeepDiff::NO_VALUE, right: [1, 2, 3] } },
        { h: { left: HashDeepDiff::NO_VALUE, right: {} } },
