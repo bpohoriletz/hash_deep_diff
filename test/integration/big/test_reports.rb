@@ -6,7 +6,7 @@ describe 'Integration tests: ' do
   describe '[BIG]HashDeepDiff::Comparison#report' do
     let(:expectation) do
       <<~Q
-        -left[b][c][e] = [{}]
+        -left[b][c][e] = {}
         +left[b][c][e] = [1, 2, 3]
         -left[b][c][e][f] = {}
         -left[b][c][e][f][g] = [1, 2, 3]
