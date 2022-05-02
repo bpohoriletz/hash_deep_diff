@@ -20,7 +20,7 @@ module HashDeepDiff
     def placebo
       return [] unless partial?
 
-      placebo = simple_left? ? { left: NO_VALUE, right: {} } : { left: {}, right: NO_VALUE }
+      placebo = simple_left? ? { left: NO_VALUE, right: placebo_elment } : { left: placebo_elment, right: NO_VALUE }
 
       [self.class.new(change_key: change_key, value: placebo)]
     end
@@ -88,6 +88,14 @@ module HashDeepDiff
     def simple_right?
       !(right.respond_to?(:to_hash) ||
         (right.respond_to?(:to_ary) && right.any? { |el| el.respond_to?(:to_hash) }))
+    end
+
+    # an indication of added/removed nested Hash
+    # @return [Array, Hash]
+    def placebo_elment
+      return [{}] if right.respond_to?(:to_ary) || left.respond_to?(:to_ary)
+
+      return {}
     end
   end
 end

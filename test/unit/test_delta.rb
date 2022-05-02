@@ -35,7 +35,7 @@ describe HashDeepDiff::Delta do
     end
 
     it 'is empty left for nesting added inside array' do
-      assert_equal([{ 'a' => { left: HashDeepDiff::NO_VALUE, right: {} } }], mediumsmall_inside_array.placebo)
+      assert_equal([{ 'a' => { left: HashDeepDiff::NO_VALUE, right: [{}] } }], mediumsmall_inside_array.placebo)
     end
 
     it 'is empty right for added nesting' do
@@ -43,7 +43,7 @@ describe HashDeepDiff::Delta do
     end
 
     it 'is empty right for nesting addd inside array' do
-      assert_equal([{ 'a' => { right: HashDeepDiff::NO_VALUE, left: {} } }], smallmedium_inside_array.placebo)
+      assert_equal([{ 'a' => { right: HashDeepDiff::NO_VALUE, left: [{}] } }], smallmedium_inside_array.placebo)
     end
   end
 
