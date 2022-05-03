@@ -25,20 +25,26 @@ module HashDeepDiff
       [self.class.new(change_key: change_key, value: placebo)]
     end
 
+    # true if any value is an +Array+ with hashes
+    # @return [TrueClass, FalseClass]
+    def complex?
+      complex_left? || complex_right?
+    end
+
     # true if at least one of the values is a Hash
-    # @return [Bool]
+    # @return [TrueClass, FalseClass]
     def partial?
       !composite? && !simple?
     end
 
     # true if both valus are Hashes
-    # @return [Bool]
+    # @return [TrueClass, FalseClass]
     def composite?
       !simple_left? && !simple_right?
     end
 
     # true if none of the values is a Hash
-    # @return [Bool]
+    # @return [TrueClass, FalseClass]
     def simple?
       simple_left? && simple_right?
     end
@@ -85,25 +91,25 @@ module HashDeepDiff
     end
 
     # true if left value has no nested Hashes
-    # @return [Bool]
+    # @return [TrueClass, FalseClass]
     def simple_left?
       !left.respond_to?(:to_hash) && !complex_left?
     end
 
     # true if right value has no nested Hashes
-    # @return [Bool]
+    # @return [TrueClass, FalseClass]
     def simple_right?
       !right.respond_to?(:to_hash) && !complex_right?
     end
 
     # true if right part is an +Array+ with hashes
-    # @return [Bool]
+    # @return [TrueClass, FalseClass]
     def complex_right?
       right.respond_to?(:to_ary) && right.any? { |el| el.respond_to?(:to_hash) }
     end
 
     # true if left part is an +Array+ with hashes
-    # @return [Bool]
+    # @return [TrueClass, FalseClass]
     def complex_left?
       left.respond_to?(:to_ary) && left.any? { |el| el.respond_to?(:to_hash) }
     end
