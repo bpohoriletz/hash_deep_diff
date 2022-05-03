@@ -47,6 +47,28 @@ describe HashDeepDiff::Delta do
     end
   end
 
+  describe '#complex?' do
+    it 'is false if diff does not include array with hashes' do
+      refute_predicate small, :complex?
+    end
+
+    it 'is false if diff is two hashes' do
+      refute_predicate medium, :complex?
+    end
+
+    it 'is true if diff has array with hashes on left' do
+      assert_predicate smallmedium_inside_array, :complex?
+    end
+
+    it 'is true if diff has array with hashes on right' do
+      assert_predicate mediumsmall_inside_array, :complex?
+    end
+
+    it 'is true if diff is two arrays with hashes' do
+      assert_predicate medium_inside_array, :complex?
+    end
+  end
+
   describe '#composite?' do
     it 'is false if diff does not include nested hashes' do
       refute_predicate small, :composite?
