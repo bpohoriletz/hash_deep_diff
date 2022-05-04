@@ -63,6 +63,7 @@ module HashDeepDiff
     def left(key = NO_VALUE)
       return NO_VALUE if @left == NO_VALUE
       return @left if key == NO_VALUE
+      return @left unless left.respond_to?(:to_hash)
 
       @left[key] || NO_VALUE
     end
@@ -71,6 +72,7 @@ module HashDeepDiff
     def right(key = NO_VALUE)
       return NO_VALUE if @right == NO_VALUE
       return @right if key == NO_VALUE
+      return @right unless right.respond_to?(:to_hash)
 
       @right[key] || NO_VALUE
     end
@@ -107,14 +109,10 @@ module HashDeepDiff
     def inward_comparison(complex_delta)
       if complex_delta.partial?
         complex_delta.placebo +
-          comparison(delta: complex_delta, modifier: :addition).diff +
-          comparison(delta: complex_delta, modifier: :deletion).diff
+          comparison(delta: complex_delta, modifier: :addition).map(&:diff).flatten +
+          comparison(delta: complex_delta, modifier: :deletion).map(&:diff).flatten
       else
-        # if primitive
-        # if both arrays
-        # if left array with hashes
-        # if right array with hases
-        comparison(delta: complex_delta).diff
+        comparison(delta: complex_delta).map(&:diff).flatten
       end
     end
 
