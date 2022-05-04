@@ -1,27 +1,25 @@
 # frozen_string_literal: true
 
+require 'forwardable'
+
 module HashDeepDiff
   # factories
   module Factories
     # Factory for {HashDeepDiff::Comparison}
     class Comparison
+      extend Forwardable
+
+      def_delegators :@delta, :left, :right, :change_key, :complex?, :complex_left?, :complex_right?
+
       # factory function
       # @return [HashDeepDiff::Comparison]
       def comparison(delta:, modifier: :change)
-        # chunks.map do |(left, right, change_key)|
-        # HashDeepDiff::Comparison.new(left, right, change_key,
-        # delta_engine: delta.class,
-        # reporting_engine: reporting_engine)
-        # end
-        case modifier
-        when :change
-          inward_comparison(delta)
-        when :deletion
-          compare_original_no_nothing(delta)
-        when :addition
-          compare_nothing_to_changed(delta)
-        else
-          raise Error, 'Unknown modifier'
+        @delta = delta
+
+        chunks(modifier).map do |(left, right, change_key)|
+          HashDeepDiff::Comparison.new(left, right, change_key,
+                                       delta_engine: delta.class,
+                                       reporting_engine: reporting_engine)
         end
       end
 
@@ -37,112 +35,69 @@ module HashDeepDiff
         @reporting_engine = reporting_engine
       end
 
-      # compare two hashes
-      # @return [HashDeepDiff::Comparison]
-      def inward_comparison(delta)
-        if delta.complex?
-          # if left array with hashes
-          # if right array with hases
-          # else hashes
-          if delta.complex_left? && delta.complex_right?
-            left_array = delta.left.reject { |e| e.respond_to?(:to_hash) }
-            right_array = delta.right.reject { |e| e.respond_to?(:to_hash) }
-            left_hashes = delta.left.select do |e|
-                            e.respond_to?(:to_hash)
-                          end.each_with_object({}) { |e, memo| memo.merge!(e) }
-            right_hashes = delta.right.select do |e|
-                             e.respond_to?(:to_hash)
-                           end.each_with_object({}) { |e, memo| memo.merge!(e) }
+      # @return [Array]
+      def chunks(mode)
+        case mode
+        when :change
+          return [[left, right, change_key]] unless complex?
+
+          if complex_left? && complex_right?
             [
-              HashDeepDiff::Comparison.new(left_array, right_array, delta.change_key + ['...'],
-                                           delta_engine: delta.class,
-                                           reporting_engine: reporting_engine),
-              HashDeepDiff::Comparison.new(left_hashes, right_hashes, delta.change_key + ['{}'],
-                                           delta_engine: delta.class,
-                                           reporting_engine: reporting_engine)
+              [left_array, right_array, change_key + ['...']],
+              [left_hashes, right_hashes, change_key + ['{}']]
             ]
-          elsif delta.complex_right?
-            right_array = delta.right.reject { |e| e.respond_to?(:to_hash) }
-            right_hashes = delta.right.select do |e|
-                             e.respond_to?(:to_hash)
-                           end.each_with_object({}) { |e, memo| memo.merge!(e) }
-            if delta.left.respond_to?(:to_hash)
+          elsif complex_right?
+            if left.respond_to?(:to_hash)
               [
-                HashDeepDiff::Comparison.new(NO_VALUE, right_array, delta.change_key + ['...'],
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine),
-                HashDeepDiff::Comparison.new(NO_VALUE, right_hashes, delta.change_key + ['{}'],
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine),
-                HashDeepDiff::Comparison.new(delta.left, NO_VALUE, delta.change_key,
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine)
+                [NO_VALUE, right_array, change_key + ['...']],
+                [NO_VALUE, right_hashes, change_key + ['{}']],
+                [left, NO_VALUE, change_key]
               ]
             else
               [
-                HashDeepDiff::Comparison.new(delta.left, right_array, delta.change_key + ['...'],
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine),
-                HashDeepDiff::Comparison.new(NO_VALUE, right_hashes, delta.change_key + ['{}'],
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine)
+                [left, right_array, change_key + ['...']],
+                [NO_VALUE, right_hashes, change_key + ['{}']]
               ]
             end
+          elsif right.respond_to?(:to_hash)
+            [
+              [left_array, NO_VALUE, change_key + ['...']],
+              [left_hashes, NO_VALUE, change_key + ['{}']],
+              [NO_VALUE, right, change_key]
+            ]
           else
-            left_array = delta.left.reject { |e| e.respond_to?(:to_hash) }
-            left_hashes = delta.left.select do |e|
-                            e.respond_to?(:to_hash)
-                          end.each_with_object({}) { |e, memo| memo.merge!(e) }
-            if delta.right.respond_to?(:to_hash)
-              [
-                HashDeepDiff::Comparison.new(left_array, NO_VALUE, delta.change_key + ['...'],
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine),
-                HashDeepDiff::Comparison.new(left_hashes, NO_VALUE, delta.change_key + ['{}'],
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine),
-                HashDeepDiff::Comparison.new(NO_VALUE, delta.right, delta.change_key,
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine)
-              ]
-            else
-              [
-                HashDeepDiff::Comparison.new(left_array, delta.right, delta.change_key + ['...'],
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine),
-                HashDeepDiff::Comparison.new(left_hashes, NO_VALUE, delta.change_key + ['{}'],
-                                             delta_engine: delta.class,
-                                             reporting_engine: reporting_engine)
-              ]
-            end
+            [
+              [left_array, right, change_key + ['...']],
+              [left_hashes, NO_VALUE, change_key + ['{}']]
+            ]
           end
+        when :deletion
+          [[left, NO_VALUE, change_key]]
+        when :addition
+          [[NO_VALUE, right, change_key]]
         else
-          [
-            HashDeepDiff::Comparison.new(delta.left, delta.right, delta.change_key,
-                                         delta_engine: delta.class,
-                                         reporting_engine: reporting_engine)
-          ]
+          raise Error, 'Unknown modifier'
         end
       end
 
-      # compare Hash with nothing (deletion)
-      # @return [HashDeepDiff::Comparison]
-      def compare_original_no_nothing(delta)
-        [
-          HashDeepDiff::Comparison.new(delta.left, NO_VALUE, delta.change_key,
-                                       delta_engine: delta.class,
-                                       reporting_engine: reporting_engine)
-        ]
+      def left_array
+        left.reject { |el| el.respond_to?(:to_hash) }
       end
 
-      # compare nothing with Hash (addition)
-      # @return [HashDeepDiff::Comparison]
-      def compare_nothing_to_changed(delta)
-        [
-          HashDeepDiff::Comparison.new(NO_VALUE, delta.right, delta.change_key,
-                                       delta_engine: delta.class,
-                                       reporting_engine: reporting_engine)
-        ]
+      def right_array
+        right.reject { |el| el.respond_to?(:to_hash) }
+      end
+
+      def left_hashes
+        left
+          .select { |el| el.respond_to?(:to_hash) }
+          .each_with_object({}) { |el, memo| memo.merge!(el) }
+      end
+
+      def right_hashes
+        right
+          .select { |el| el.respond_to?(:to_hash) }
+          .each_with_object({}) { |el, memo| memo.merge!(el) }
       end
     end
   end
