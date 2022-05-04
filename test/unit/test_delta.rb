@@ -22,12 +22,12 @@ describe HashDeepDiff::Delta do
   end
 
   describe '#placebo' do
-    it 'is empty for simple deltas' do
-      assert_empty(small.placebo)
+    it 'is not empty for simple deltas' do
+      assert_equal([{ 'a' => { left: HashDeepDiff::NO_VALUE, right: {} } }], small.placebo)
     end
 
-    it 'is empty for complex deltas' do
-      assert_empty(big.placebo)
+    it 'is not empty for complex deltas' do
+      assert_equal([{ 'a' => { left: {}, right: HashDeepDiff::NO_VALUE } }], big.placebo)
     end
 
     it 'is empty left for added nesting' do
@@ -88,16 +88,16 @@ describe HashDeepDiff::Delta do
       assert_predicate mediumsmall, :partial?
     end
 
-    it 'is true if right part of diff is array with hashes' do
-      assert_predicate mediumsmall_inside_array, :partial?
+    it 'is false if right part of diff is array with hashes' do
+      refute_predicate mediumsmall_inside_array, :partial?
     end
 
     it 'is true if left part of diff includes nested hashes' do
       assert_predicate smallmedium, :partial?
     end
 
-    it 'is true if left part of diff is array with hashes' do
-      assert_predicate smallmedium_inside_array, :partial?
+    it 'is false if left part of diff is array with hashes' do
+      refute_predicate smallmedium_inside_array, :partial?
     end
   end
 

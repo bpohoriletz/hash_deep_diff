@@ -18,8 +18,6 @@ module HashDeepDiff
     # an indication that nested Hash was deleted/added
     # @return [Array<HashDeepDiff::Delta>]
     def placebo
-      return [] unless partial?
-
       placebo = simple_left? ? { left: NO_VALUE, right: placebo_elment } : { left: placebo_elment, right: NO_VALUE }
 
       [self.class.new(change_key: change_key, value: placebo)]
@@ -31,10 +29,22 @@ module HashDeepDiff
       complex_left? || complex_right?
     end
 
+    # true if right part is an +Array+ with hashes
+    # @return [TrueClass, FalseClass]
+    def complex_right?
+      right.respond_to?(:to_ary) && right.any? { |el| el.respond_to?(:to_hash) }
+    end
+
+    # true if left part is an +Array+ with hashes
+    # @return [TrueClass, FalseClass]
+    def complex_left?
+      left.respond_to?(:to_ary) && left.any? { |el| el.respond_to?(:to_hash) }
+    end
+
     # true if at least one of the values is a Hash
     # @return [TrueClass, FalseClass]
     def partial?
-      !composite? && !simple?
+      !composite? && !simple? && !complex_left? && !complex_right?
     end
 
     # true if both valus are Hashes
@@ -100,18 +110,6 @@ module HashDeepDiff
     # @return [TrueClass, FalseClass]
     def simple_right?
       !right.respond_to?(:to_hash) && !complex_right?
-    end
-
-    # true if right part is an +Array+ with hashes
-    # @return [TrueClass, FalseClass]
-    def complex_right?
-      right.respond_to?(:to_ary) && right.any? { |el| el.respond_to?(:to_hash) }
-    end
-
-    # true if left part is an +Array+ with hashes
-    # @return [TrueClass, FalseClass]
-    def complex_left?
-      left.respond_to?(:to_ary) && left.any? { |el| el.respond_to?(:to_hash) }
     end
   end
 end
