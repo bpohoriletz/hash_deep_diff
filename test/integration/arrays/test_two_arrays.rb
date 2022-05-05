@@ -5,6 +5,7 @@ require 'test_helper'
 describe 'Integration tests: ' do
   let(:left) { { a: [1, 2, 3] } }
   let(:right) { { a: [3, 4, 5] } }
+  let(:right_addition) { { a: [3, 4, 5, 6] } }
   let(:medium_left) { { a: [1, 2, 3, { a: :b }] } }
   let(:medium_right) { { a: [3, { a: :c }, 4, 5] } }
 
@@ -37,6 +38,16 @@ describe 'Integration tests: ' do
       Q
 
       report = HashDeepDiff::Comparison.new(left, right).report
+
+      assert_equal(diff, report)
+    end
+
+    it 'reports addition to arrays' do
+      diff = <<~Q
+        +left[a] = [6]
+      Q
+
+      report = HashDeepDiff::Comparison.new(right, right_addition).report
 
       assert_equal(diff, report)
     end
