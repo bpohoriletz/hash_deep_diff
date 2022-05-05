@@ -49,6 +49,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest-focus', '~> 1.3.1'
   spec.add_development_dependency 'minitest-reporters', '~> 1.5.0'
   spec.add_development_dependency 'naught', '~> 1.1.0'
+  spec.add_development_dependency 'pry-byebug', '~> 3.9.0'
   spec.add_development_dependency 'rake', '~> 10.5.0'
   spec.add_development_dependency 'rubocop', '~> 1.26.1'
   spec.add_development_dependency 'rubocop-minitest', '~> 0.18.0'
