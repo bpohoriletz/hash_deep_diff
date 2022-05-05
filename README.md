@@ -5,7 +5,9 @@ Status](https://img.shields.io/github/workflow/status/bpohoriletz/hash_deep_diff
 ![GitHub](https://img.shields.io/github/license/bpohoriletz/hash_deep_diff)
 
 
-Find the exact difference between two Hash objects and build a report to visualize it
+Find the exact difference between two Hash objects and build a report to visualize it. Works for other objects too but why would you do that :/
+
+Alternative solutions [hashdiff by liufengyun](https://github.com/liufengyun/hashdiff) and [hash_hdiff by CodingZeal](https://github.com/CodingZeal/hash_diff)
 
 ## Installation
 
@@ -37,7 +39,7 @@ HashDeepDiff::Comparison.new(left, right).report
 + left[a] = b
 ```
 please see [Documentation](https://rdoc.info/gems/hash_deep_diff/HashDeepDiff/Comparison) for
-more information 
+more information or [Reporting test](https://github.com/bpohoriletz/hash_deep_diff/blob/a525d239189b0310aec3741dfc4862834805252d/test/integration/locales/test_uk_ru.rb#L59)
 
 ## Customization
 
