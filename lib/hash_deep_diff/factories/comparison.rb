@@ -16,7 +16,7 @@ module HashDeepDiff
       def comparison(delta:, modifier: :change)
         @delta = delta
 
-        chunks(modifier).map do |(left, right, change_key)|
+        chunks(modifier).compact.map do |(left, right, change_key)|
           HashDeepDiff::Comparison.new(left, right, change_key,
                                        delta_engine: delta.class,
                                        reporting_engine: reporting_engine)
@@ -41,60 +41,42 @@ module HashDeepDiff
         when :change
           return [[left, right, change_key]] unless complex?
 
-          if complex_left? && complex_right?
-            [
-              [left_array, right_array, change_key + ['...']],
-              [left_hashes, right_hashes, change_key + ['{}']]
-            ]
-          elsif complex_right?
-            if left.respond_to?(:to_hash)
-              [
-                [NO_VALUE, right_array, change_key + ['...']],
-                [NO_VALUE, right_hashes, change_key + ['{}']],
-                [left, NO_VALUE, change_key]
-              ]
-            else
-              [
-                [left, right_array, change_key + ['...']],
-                [NO_VALUE, right_hashes, change_key + ['{}']]
-              ]
-            end
-          elsif right.respond_to?(:to_hash)
-            [
-              [left_array, NO_VALUE, change_key + ['...']],
-              [left_hashes, NO_VALUE, change_key + ['{}']],
-              [NO_VALUE, right, change_key]
-            ]
-          else
-            [
-              [left_array, right, change_key + ['...']],
-              [left_hashes, NO_VALUE, change_key + ['{}']]
-            ]
-          end
+          [[left_array, right_array, change_key + ['...']],
+           [left_hashes, right_hashes, change_key + ['{}']]]
         when :deletion
           [[left, NO_VALUE, change_key]]
         when :addition
           [[NO_VALUE, right, change_key]]
-        else
-          raise Error, 'Unknown modifier'
         end
       end
 
+      # @return [Object]
       def left_array
+        return left unless left.respond_to?(:to_ary)
+
         left.reject { |el| el.respond_to?(:to_hash) }
       end
 
+      # @return [Object]
       def right_array
+        return right unless right.respond_to?(:to_ary)
+
         right.reject { |el| el.respond_to?(:to_hash) }
       end
 
+      # @return [Array<Hash>]
       def left_hashes
+        return NO_VALUE unless complex_left?
+
         left
           .select { |el| el.respond_to?(:to_hash) }
           .each_with_object({}) { |el, memo| memo.merge!(el) }
       end
 
+      # @return [Array<Hash>]
       def right_hashes
+        return NO_VALUE unless complex_right?
+
         right
           .select { |el| el.respond_to?(:to_hash) }
           .each_with_object({}) { |el, memo| memo.merge!(el) }
