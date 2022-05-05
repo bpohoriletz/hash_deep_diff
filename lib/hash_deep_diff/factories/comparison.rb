@@ -9,14 +9,14 @@ module HashDeepDiff
     class Comparison
       extend Forwardable
 
-      def_delegators :@delta, :left, :right, :change_key, :complex?, :complex_left?, :complex_right?
+      def_delegators :delta, :left, :right, :change_key, :complex?, :complex_left?, :complex_right?
 
       # factory function
       # @return [HashDeepDiff::Comparison]
       def comparison(delta:, modifier: :change)
         @delta = delta
 
-        chunks(modifier).compact.map do |(left, right, change_key)|
+        fragments(modifier).map do |(left, right, change_key)|
           HashDeepDiff::Comparison.new(left, right, change_key,
                                        delta_engine: delta.class,
                                        reporting_engine: reporting_engine)
@@ -35,37 +35,41 @@ module HashDeepDiff
         @reporting_engine = reporting_engine
       end
 
+      # entities for further comparison
       # @return [Array]
-      def chunks(mode)
+      def fragments(mode)
         case mode
         when :change
-          return [[left, right, change_key]] unless complex?
+          return [[value_left, value_right, change_key]] unless complex?
 
-          [[left_array, right_array, change_key + ['...']],
-           [left_hashes, right_hashes, change_key + ['{}']]]
+          [[value_left, value_right, change_key + ['...']],
+           [nesting_left, nesting_right, change_key + ['{}']]]
         when :deletion
-          [[left, NO_VALUE, change_key]]
+          [[value_left, NO_VALUE, change_key]]
         when :addition
-          [[NO_VALUE, right, change_key]]
+          [[NO_VALUE, value_right, change_key]]
         end
       end
 
+      # original value without nested hashes
       # @return [Object]
-      def left_array
+      def value_left
         return left unless left.respond_to?(:to_ary)
 
         left.reject { |el| el.respond_to?(:to_hash) }
       end
 
+      # changed value without nested hashes
       # @return [Object]
-      def right_array
+      def value_right
         return right unless right.respond_to?(:to_ary)
 
         right.reject { |el| el.respond_to?(:to_hash) }
       end
 
+      # nested hashes from original value
       # @return [Array<Hash>]
-      def left_hashes
+      def nesting_left
         return NO_VALUE unless complex_left?
 
         left
@@ -73,8 +77,9 @@ module HashDeepDiff
           .each_with_object({}) { |el, memo| memo.merge!(el) }
       end
 
+      # nested hashes from changed value
       # @return [Array<Hash>]
-      def right_hashes
+      def nesting_right
         return NO_VALUE unless complex_right?
 
         right
