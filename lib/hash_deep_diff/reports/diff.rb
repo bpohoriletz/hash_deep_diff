@@ -13,24 +13,38 @@ module HashDeepDiff
       # @return [String]
       def original
         return '' if old_val == NO_VALUE
-        return "#{deletion}#{path} = #{old_val.sort - new_val.sort}\n" if array_with_array?
+        return "#{deletion}#{path} = #{old_val}\n" unless array_to_array?
+        return '' if array_deletion.empty?
 
-        return "#{deletion}#{path} = #{old_val}\n"
+        "#{deletion}#{path} = #{array_deletion}\n"
       end
 
       # line of the report with added value
       # @return [String]
       def replacement
         return '' if new_val == NO_VALUE
-        return "#{addition}#{path} = #{new_val.sort - old_val.sort}\n" if array_with_array?
+        return "#{addition}#{path} = #{new_val}\n" unless array_to_array?
+        return '' if array_addition.empty?
 
-        return "#{addition}#{path} = #{new_val}\n"
+        "#{addition}#{path} = #{array_addition}\n"
       end
 
       # returns true if original value and replacement are instances of +Array+
       # @return Bool
-      def array_with_array?
+      def array_to_array?
         old_val.instance_of?(Array) && new_val.instance_of?(Array)
+      end
+
+      # added elemnts of array
+      # @return [Array]
+      def array_addition
+        new_val - old_val
+      end
+
+      # added elemnts of array
+      # @return [Array]
+      def array_deletion
+        old_val - new_val
       end
 
       # Visual representation of keys from compared objects needed to fetch the compared values

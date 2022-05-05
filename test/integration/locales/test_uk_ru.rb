@@ -59,23 +59,17 @@ describe 'Integration tests: ' do
   describe '[LOCALES]HashDeepDiff::Comparison#report' do
     let(:uk_ru_report) do
       <<~Q
-        -left[{}][faker][...] = []
         +left[{}][faker][...] = [:country_code]
-        -left[{}][faker][{}][address] = [:city_prefix, :city_suffix, :feminine_street_prefix, \
-        :feminine_street_title, :masculine_street_prefix, \
-        :masculine_street_title, :state_abbr, :street_prefix]
-        +left[{}][faker][{}][address] = []
+        -left[{}][faker][{}][address] = [:masculine_street_prefix, :feminine_street_prefix, \
+        :street_prefix, :state_abbr, :masculine_street_title, :feminine_street_title, \
+        :city_prefix, :city_suffix]
         -left[{}][faker][{}][cell_phone] = [:formats]
         -left[{}][faker][{}][company] = [:product]
-        +left[{}][faker][{}][company] = []
         -left[{}][faker][{}][music] = [:instruments]
         -left[{}][faker][{}][artist] = [:names]
         -left[{}][activerecord][{}][models][...] = [:user]
-        +left[{}][activerecord][{}][models][...] = []
         +left[{}][activerecord][{}][models][{}][user] = [:few, :many, :one, :other]
-        -left[{}][number][{}][human][{}][storage_units][{}][units][...] = []
         +left[{}][number][{}][human][{}][storage_units][{}][units][...] = [:eb, :pb]
-        -left[{}][number][{}][percentage][{}][format] = []
         +left[{}][number][{}][percentage][{}][format] = [:format]
       Q
     end
