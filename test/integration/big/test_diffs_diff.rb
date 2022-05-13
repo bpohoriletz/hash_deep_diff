@@ -46,7 +46,7 @@ describe 'Integration tests: ' do
 
     it 'reports elements that are different' do
       left, right = load_fixture('n_level/big', 'n_level/huge')
-      right.merge!({ f: { g: { h: 'j' } } })
+      right[:f] = { g: { h: 'j' } }
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 

@@ -7,50 +7,58 @@ module HashDeepDiff
   module Reports
     # Visual representation of the {Delta} as diff
     class Diff < Base
+      def report
+        raw_report.map { |delta| original(delta) + replacement(delta) }.join
+      end
+
+      def raw_report
+        diff
+      end
+
       private
 
       # line of the report with deleted value
       # @return [String]
-      def original
-        return '' if old_val == NO_VALUE
-        return "#{deletion}#{path} = #{old_val}\n" unless array_to_array?
-        return '' if array_deletion.empty?
+      def original(delta)
+        return '' if delta.left == NO_VALUE
+        return "#{deletion}#{path(delta)} = #{delta.left}\n" unless array_to_array?(delta)
+        return '' if array_deletion(delta).empty?
 
-        "#{deletion}#{path} = #{array_deletion}\n"
+        "#{deletion}#{path(delta)} = #{array_deletion(delta)}\n"
       end
 
       # line of the report with added value
       # @return [String]
-      def replacement
-        return '' if new_val == NO_VALUE
-        return "#{addition}#{path} = #{new_val}\n" unless array_to_array?
-        return '' if array_addition.empty?
+      def replacement(delta)
+        return '' if delta.right == NO_VALUE
+        return "#{addition}#{path(delta)} = #{delta.right}\n" unless array_to_array?(delta)
+        return '' if array_addition(delta).empty?
 
-        "#{addition}#{path} = #{array_addition}\n"
+        "#{addition}#{path(delta)} = #{array_addition(delta)}\n"
       end
 
       # returns true if original value and replacement are instances of +Array+
       # @return Bool
-      def array_to_array?
-        old_val.instance_of?(Array) && new_val.instance_of?(Array)
+      def array_to_array?(delta)
+        delta.left.instance_of?(Array) && delta.right.instance_of?(Array)
       end
 
       # added elemnts of array
       # @return [Array]
-      def array_addition
-        new_val - old_val
+      def array_addition(delta)
+        delta.right - delta.left
       end
 
       # added elemnts of array
       # @return [Array]
-      def array_deletion
-        old_val - new_val
+      def array_deletion(delta)
+        delta.left - delta.right
       end
 
       # Visual representation of keys from compared objects needed to fetch the compared values
       # @return [String]
-      def path
-        change_key.map { |key| "[#{key}]" }.join
+      def path(delta)
+        delta.change_key.map { |key| "[#{key}]" }.join
       end
 
       # visual indication of addition

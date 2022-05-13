@@ -35,7 +35,7 @@ describe HashDeepDiff::Comparison do
 
     it 'finds elements that differ for complex change' do
       left, right = load_fixture('two_level/big', 'two_level/big')
-      right.merge!({ b: { c: 'd' } })
+      right[:b] = { c: 'd' }
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -47,7 +47,7 @@ describe HashDeepDiff::Comparison do
     it 'uses report engine to build a visual representation of changes' do
       report = HashDeepDiff::Comparison.new({}, {}, delta_engine: spy, reporting_engine: spy).report
 
-      assert_equal('', report)
+      assert_equal('', report.to_s)
     end
   end
 end

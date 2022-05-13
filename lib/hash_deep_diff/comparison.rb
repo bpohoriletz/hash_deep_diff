@@ -46,11 +46,7 @@ module HashDeepDiff
     attr_reader :reporting_engine, :delta_engine
 
     def_delegators :comparison_factory, :comparison
-
-    # @return [String]
-    def report
-      diff.map { |simple_delta| reporting_engine.new(delta: simple_delta).to_s }.join
-    end
+    def_delegators :report_engine_factory, :report
 
     # @return [Array<HashDeepDiff::Delta>]
     def diff
@@ -132,11 +128,6 @@ module HashDeepDiff
       keys.uniq
     end
 
-    # @return [HashDeepDiff::Factories::Comparison]
-    def comparison_factory
-      HashDeepDiff::Factories::Comparison.new(reporting_engine: reporting_engine)
-    end
-
     # factory function
     # @return [HashDeepDiff::Delta]
     def delta(key: NO_VALUE)
@@ -144,6 +135,16 @@ module HashDeepDiff
       change_key += [key] unless key == NO_VALUE
 
       HashDeepDiff::Delta.new(change_key: change_key, value: { left: left(key), right: right(key) })
+    end
+
+    # @return [HashDeepDiff::Factories::Comparison]
+    def comparison_factory
+      HashDeepDiff::Factories::Comparison.new(reporting_engine: reporting_engine)
+    end
+
+    # @return [HashDeepDiff::Reports::Base]
+    def report_engine_factory
+      reporting_engine.new(diff: diff)
     end
   end
 end

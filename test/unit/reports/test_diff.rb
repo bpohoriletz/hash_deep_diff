@@ -13,7 +13,7 @@ describe HashDeepDiff::Reports::Diff do
 
   describe '#to_str' do
     it 'includes addition and deletion for changes' do
-      instance = described_class.new(delta: change)
+      instance = described_class.new(diff: [change])
       report = <<~Q
         -left[a] = b
         +left[a] = c
@@ -23,7 +23,7 @@ describe HashDeepDiff::Reports::Diff do
     end
 
     it 'excludes addition for deletion' do
-      instance = described_class.new(delta: deletion)
+      instance = described_class.new(diff: [deletion])
       report = <<~Q
         -left[a] = b
       Q
@@ -32,7 +32,7 @@ describe HashDeepDiff::Reports::Diff do
     end
 
     it 'excludes deletion for addition' do
-      instance = described_class.new(delta: addition)
+      instance = described_class.new(diff: [addition])
       report = <<~Q
         +left[a] = c
       Q
@@ -41,7 +41,7 @@ describe HashDeepDiff::Reports::Diff do
     end
 
     it 'formats arrays for report' do
-      instance = described_class.new(delta: array_change)
+      instance = described_class.new(diff: [array_change])
       report = <<~Q
         -left[a] = b
         +left[a] = [:c, :d]
@@ -51,7 +51,7 @@ describe HashDeepDiff::Reports::Diff do
     end
 
     it 'reports difference betwen arrays' do
-      instance = described_class.new(delta: two_arrays)
+      instance = described_class.new(diff: [two_arrays])
       report = <<~Q
         -left[a] = [:b]
         +left[a] = [:d]
