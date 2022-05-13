@@ -5,44 +5,38 @@ module HashDeepDiff
   module Reports
     # Abstract Class
     class Base
+      # raw data for {#report}
+      def raw_report
+        raise AbstractMethodError
+      end
+
       # see {#to_str}
       # @return [String]
       def to_s
         to_str
       end
 
-      # A report on additions and deletions
+      # see {#report}
       # @return [String]
       def to_str
-        original + replacement
+        report
+      end
+
+      # A report on additions and deletions
+      # @return [String]
+      def report
+        raise AbstractMethodError
       end
 
       private
 
-      # @!attribute [r] old_val
-      #    @return [Object] original value
-      # @!attribute [r] new_val
-      #    @return [Object] replacement of the original value
-      # @!attribute [r] change_key
-      #    @return [Array<Object>] subset of keys from original Hashes to fetch reported values
-      #    (is empty for top-level comparison)
-      attr_reader :old_val, :new_val, :change_key
+      # @!attribute [r] diff
+      #    @return [Array<HashDeepDiff::Delta>] set of deltas from Comparison of two objects
+      attr_reader :diff
 
-      # @param [Delta] delta diff to report
-      def initialize(delta:)
-        @change_key = delta.change_key.to_ary
-        @old_val = delta.left
-        @new_val = delta.right
-      end
-
-      # old value
-      def original
-        raise AbstractMethodError
-      end
-
-      # new value
-      def replacement
-        raise AbstractMethodError
+      # @param [Array<HashDeepDiff::Delta>] diff comparison data to report
+      def initialize(diff:)
+        @diff = diff.to_ary
       end
     end
   end

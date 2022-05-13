@@ -6,7 +6,7 @@ describe 'Integration tests: ' do
   describe '[MEDIUM]HashDeepDiff::Comparison#diff' do
     it 'finds elements that differ' do
       left, right = load_fixture('two_level/big', 'two_level/big')
-      right.merge!({ b: { c: 'd' } })
+      right[:b] = { c: 'd' }
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
@@ -18,7 +18,7 @@ describe 'Integration tests: ' do
 
     it 'finds elements that differ' do
       left, right = load_fixture('two_level/big', 'two_level/big')
-      right.merge!({ b: { c: 'd', e: 3 } })
+      right[:b] = { c: 'd', e: 3 }
 
       diff = HashDeepDiff::Comparison.new(left, right).diff
 
