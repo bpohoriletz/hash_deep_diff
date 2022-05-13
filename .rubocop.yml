@@ -10,6 +10,7 @@ AllCops:
     - '.git/**/*'
     - '.bundle/**/*'
     - 'bin/*'
+  TargetRubyVersion: 2.6.1
 
 Style/RedundantReturn:
   Enabled: false
