@@ -11,7 +11,7 @@ module Support
 
     module InstanceMethods
       def load_fixture(*names)
-        return Fixture.new(name: names[0]).fetch if names.size == 1
+        return Fixture.new(name: names[0]).fetch if 1 == names.size
 
         names.map { |name| Fixture.new(name: name).fetch }
       end

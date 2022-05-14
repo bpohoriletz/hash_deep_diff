@@ -39,6 +39,7 @@ module HashDeepDiff
 
       # returns true if original value and replacement are instances of +Array+
       # @return Bool
+      # TOFIX drop
       def array_to_array?(delta)
         delta.left.instance_of?(Array) && delta.right.instance_of?(Array)
       end

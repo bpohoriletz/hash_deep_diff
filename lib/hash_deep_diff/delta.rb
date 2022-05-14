@@ -59,9 +59,23 @@ module HashDeepDiff
       simple_left? && simple_right?
     end
 
+    # removed element(s)
+    def deletion
+      return left unless array_with_array?
+
+      return left - right
+    end
+
     # Original value
     def left
       value[:left]
+    end
+
+    # added element(s)
+    def addition
+      return right unless array_with_array?
+
+      return right - left
     end
 
     # Value we compare to
@@ -110,6 +124,12 @@ module HashDeepDiff
     # @return [TrueClass, FalseClass]
     def simple_right?
       !right.respond_to?(:to_hash) && !complex_right?
+    end
+
+    # true if both left and right are arrays
+    # @return [TrueClass, FalseClass]
+    def array_with_array?
+      left.respond_to?(:to_ary) && right.respond_to?(:to_ary)
     end
   end
 end
