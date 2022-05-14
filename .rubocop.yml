@@ -19,3 +19,5 @@ Metrics/BlockLength:
   Exclude:
     - 'test/**/test_*.rb'
     - '*.gemspec'
+Style/YodaCondition:
+  EnforcedStyle: require_for_all_comparison_operators
