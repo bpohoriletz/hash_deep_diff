@@ -122,4 +122,24 @@ describe HashDeepDiff::Delta do
       assert_predicate small, :simple?
     end
   end
+
+  describe '#addition' do
+    it 'equals value right for simple deltas' do
+      assert_equal :b, small.addition
+    end
+
+    it 'computes differnce for arrays' do
+      assert_equal [{ b: :b }, 3], medium_inside_array.addition
+    end
+  end
+
+  describe '#deletion' do
+    it 'equals value left for simple deltas' do
+      assert_equal :a, small.deletion
+    end
+
+    it 'computes differnce for arrays' do
+      assert_equal [1, { a: :a }], medium_inside_array.deletion
+    end
+  end
 end
