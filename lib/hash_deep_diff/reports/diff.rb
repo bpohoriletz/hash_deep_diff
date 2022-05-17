@@ -7,10 +7,14 @@ module HashDeepDiff
   module Reports
     # Visual representation of the {Delta} as diff
     class Diff < Base
+      # additiond and deletions represented as diff
+      # @return [String]
       def report
         raw_report.map { |delta| original(delta) + replacement(delta) }.join
       end
 
+      # additiond and deletions raw
+      # @return [Array<HashDeepDiff::Delta>]
       def raw_report
         diff
       end

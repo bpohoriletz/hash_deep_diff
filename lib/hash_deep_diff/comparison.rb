@@ -46,7 +46,7 @@ module HashDeepDiff
     attr_reader :reporting_engine, :delta_engine
 
     def_delegators :comparison_factory, :comparison
-    def_delegators :report_engine_factory, :report
+    def_delegators :report_engine_factory, :report, :raw_report
 
     # @return [Array<HashDeepDiff::Delta>]
     def diff
