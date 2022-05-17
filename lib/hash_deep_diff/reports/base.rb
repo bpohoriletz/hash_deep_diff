@@ -35,8 +35,9 @@ module HashDeepDiff
       attr_reader :diff
 
       # @param [Array<HashDeepDiff::Delta>] diff comparison data to report
-      def initialize(diff:)
+      def initialize(diff:, change_key_engine: HashDeepDiff::ChangeKey)
         @diff = diff.to_ary
+        @change_key = change_key_engine
       end
     end
   end
