@@ -42,8 +42,8 @@ module HashDeepDiff
         when :change
           return [[value_left, value_right, change_key]] unless complex?
 
-          [[value_left, value_right, change_key + ['...']],
-           [nesting_left, nesting_right, change_key + ['{}']]]
+          [[value_left, value_right, change_key + [ChangeKey::ARRAY_VALUE]],
+           [nesting_left, nesting_right, change_key + [ChangeKey::NESTED_HASH]]]
         when :deletion
           [[value_left, NO_VALUE, change_key]]
         when :addition

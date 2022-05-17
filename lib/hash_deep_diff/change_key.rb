@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
+require 'forwardable'
+
 module HashDeepDiff
   # Key for a compared value inside Array or Hash
   class ChangeKey
+    extend Forwardable
+    def_delegators :to_ary, :[], :+, :map, :==, :first, :shift, :empty?
     # element that indicates nested Hash
     NESTED_HASH = '{}'
     # element that indicates Array value
@@ -48,6 +52,18 @@ module HashDeepDiff
       keys.shift
       obj[key] ||= []
       obj[key] << {} unless obj[key][-1].respond_to?(:to_hash)
+    end
+
+    # see {#to_ary}
+    # @return [Array]
+    def to_a
+      to_ary
+    end
+
+    # array with keysused to initialize the object
+    # @return [Array]
+    def to_ary
+      @key
     end
 
     private

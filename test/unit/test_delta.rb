@@ -3,47 +3,47 @@
 require 'test_helper'
 
 describe HashDeepDiff::Delta do
-  let(:small) { HashDeepDiff::Delta.new(change_key: :a, value: { left: :a, right: :b }) }
-  let(:smallmedium) { HashDeepDiff::Delta.new(change_key: :a, value: { left: { a: :a }, right: :b }) }
-  let(:mediumsmall) { HashDeepDiff::Delta.new(change_key: :a, value: { left: :a, right: { b: :b } }) }
-  let(:medium) { HashDeepDiff::Delta.new(change_key: :a, value: { left: { a: :a }, right: { b: :b } }) }
+  let(:small) { HashDeepDiff::Delta.new(change_key: [:a], value: { left: :a, right: :b }) }
+  let(:smallmedium) { HashDeepDiff::Delta.new(change_key: [:a], value: { left: { a: :a }, right: :b }) }
+  let(:mediumsmall) { HashDeepDiff::Delta.new(change_key: [:a], value: { left: :a, right: { b: :b } }) }
+  let(:medium) { HashDeepDiff::Delta.new(change_key: [:a], value: { left: { a: :a }, right: { b: :b } }) }
   let(:big) do
-    HashDeepDiff::Delta.new(change_key: :a, value: { left: load_fixture('empty'),
+    HashDeepDiff::Delta.new(change_key: [:a], value: { left: load_fixture('empty'),
                                                      right: load_fixture('two_level/small') })
   end
   let(:smallmedium_inside_array) do
-    HashDeepDiff::Delta.new(change_key: :a, value: { left: [1, 2, { a: :a }], right: :b })
+    HashDeepDiff::Delta.new(change_key: [:a], value: { left: [1, 2, { a: :a }], right: :b })
   end
   let(:mediumsmall_inside_array) do
-    HashDeepDiff::Delta.new(change_key: :a, value: { left: :a, right: [{ b: :b }, 2, 3] })
+    HashDeepDiff::Delta.new(change_key: [:a], value: { left: :a, right: [{ b: :b }, 2, 3] })
   end
   let(:medium_inside_array) do
-    HashDeepDiff::Delta.new(change_key: :a, value: { left: [1, 2, { a: :a }], right: [{ b: :b }, 2, 3] })
+    HashDeepDiff::Delta.new(change_key: [:a], value: { left: [1, 2, { a: :a }], right: [{ b: :b }, 2, 3] })
   end
 
   describe '#placebo' do
     it 'is not empty for simple deltas' do
-      assert_equal([{ 'a' => { left: HashDeepDiff::NO_VALUE, right: {} } }], small.placebo)
+      assert_equal([{ a: { left: HashDeepDiff::NO_VALUE, right: {} } }], small.placebo)
     end
 
     it 'is not empty for complex deltas' do
-      assert_equal([{ 'a' => { left: {}, right: HashDeepDiff::NO_VALUE } }], big.placebo)
+      assert_equal([{ a: { left: {}, right: HashDeepDiff::NO_VALUE } }], big.placebo)
     end
 
     it 'is empty left for added nesting' do
-      assert_equal([{ 'a' => { left: HashDeepDiff::NO_VALUE, right: {} } }], mediumsmall.placebo)
+      assert_equal([{ a: { left: HashDeepDiff::NO_VALUE, right: {} } }], mediumsmall.placebo)
     end
 
     it 'is empty left for nesting added inside array' do
-      assert_equal([{ 'a' => { left: HashDeepDiff::NO_VALUE, right: [{}] } }], mediumsmall_inside_array.placebo)
+      assert_equal([{ a: { left: HashDeepDiff::NO_VALUE, right: [{}] } }], mediumsmall_inside_array.placebo)
     end
 
     it 'is empty right for added nesting' do
-      assert_equal([{ 'a' => { right: HashDeepDiff::NO_VALUE, left: {} } }], smallmedium.placebo)
+      assert_equal([{ a: { right: HashDeepDiff::NO_VALUE, left: {} } }], smallmedium.placebo)
     end
 
     it 'is empty right for nesting addd inside array' do
-      assert_equal([{ 'a' => { right: HashDeepDiff::NO_VALUE, left: [{}] } }], smallmedium_inside_array.placebo)
+      assert_equal([{ a: { right: HashDeepDiff::NO_VALUE, left: [{}] } }], smallmedium_inside_array.placebo)
     end
   end
 
