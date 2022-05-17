@@ -4,6 +4,7 @@ require 'hash_deep_diff/version'
 require 'hash_deep_diff/reports/diff'
 require 'hash_deep_diff/reports/yml'
 require 'hash_deep_diff/delta'
+require 'hash_deep_diff/change_key'
 require 'hash_deep_diff/comparison'
 
 # Global namespace
