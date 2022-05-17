@@ -15,8 +15,8 @@ describe HashDeepDiff::Reports::Diff do
     it 'includes addition and deletion for changes' do
       instance = described_class.new(diff: [change])
       report = <<~Q
-        -left[a] = b
-        +left[a] = c
+        -left[:a] = b
+        +left[:a] = c
       Q
 
       assert_equal(report, instance.to_s)
@@ -25,7 +25,7 @@ describe HashDeepDiff::Reports::Diff do
     it 'excludes addition for deletion' do
       instance = described_class.new(diff: [deletion])
       report = <<~Q
-        -left[a] = b
+        -left[:a] = b
       Q
 
       assert_equal(report, instance.to_s)
@@ -34,7 +34,7 @@ describe HashDeepDiff::Reports::Diff do
     it 'excludes deletion for addition' do
       instance = described_class.new(diff: [addition])
       report = <<~Q
-        +left[a] = c
+        +left[:a] = c
       Q
 
       assert_equal(report, instance.to_s)
@@ -43,8 +43,8 @@ describe HashDeepDiff::Reports::Diff do
     it 'formats arrays for report' do
       instance = described_class.new(diff: [array_change])
       report = <<~Q
-        -left[a] = b
-        +left[a] = [:c, :d]
+        -left[:a] = b
+        +left[:a] = [:c, :d]
       Q
 
       assert_equal(report, instance.to_s)
@@ -53,8 +53,8 @@ describe HashDeepDiff::Reports::Diff do
     it 'reports difference betwen arrays' do
       instance = described_class.new(diff: [two_arrays])
       report = <<~Q
-        -left[a] = [:b]
-        +left[a] = [:d]
+        -left[:a] = [:b]
+        +left[:a] = [:d]
       Q
 
       assert_equal(report, instance.to_s)

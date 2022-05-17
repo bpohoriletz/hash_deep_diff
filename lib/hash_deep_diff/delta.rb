@@ -103,7 +103,7 @@ module HashDeepDiff
     #   that represents compared original value (at :left) and value we compare to (at :right)
     def initialize(change_key:, value:)
       @value = value
-      @change_key = HashDeepDiff::ChangeKey.new(key: change_key)
+      @change_key = HashDeepDiff::ChangeKey.new(keys: change_key)
     end
 
     # an indication of added/removed nested Hash
