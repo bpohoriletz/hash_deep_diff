@@ -63,15 +63,27 @@ module HashDeepDiff
     # array with keysused to initialize the object
     # @return [Array]
     def to_ary
-      @key
+      keys
+    end
+
+    # see {#to_str}
+    # @return [String]
+    def to_s
+      to_str
+    end
+
+    # visual representation of the change key
+    # @return [String]
+    def to_str
+      keys.map { |key| "[#{key}]" }.join
     end
 
     private
 
-    attr_reader :key
+    attr_reader :keys
 
-    def initialize(key:)
-      @key = key.to_ary
+    def initialize(keys:)
+      @keys = keys.to_ary
     end
   end
 end

@@ -25,20 +25,20 @@ module HashDeepDiff
       # @return [String]
       def original(delta)
         return '' if delta.left == NO_VALUE
-        return "#{deletion}#{path(delta)} = #{delta.left}\n" unless array_to_array?(delta)
+        return "#{deletion}#{delta.change_key} = #{delta.left}\n" unless array_to_array?(delta)
         return '' if array_deletion(delta).empty?
 
-        "#{deletion}#{path(delta)} = #{array_deletion(delta)}\n"
+        "#{deletion}#{delta.change_key} = #{array_deletion(delta)}\n"
       end
 
       # line of the report with added value
       # @return [String]
       def replacement(delta)
         return '' if delta.right == NO_VALUE
-        return "#{addition}#{path(delta)} = #{delta.right}\n" unless array_to_array?(delta)
+        return "#{addition}#{delta.change_key} = #{delta.right}\n" unless array_to_array?(delta)
         return '' if array_addition(delta).empty?
 
-        "#{addition}#{path(delta)} = #{array_addition(delta)}\n"
+        "#{addition}#{delta.change_key} = #{array_addition(delta)}\n"
       end
 
       # returns true if original value and replacement are instances of +Array+
@@ -58,12 +58,6 @@ module HashDeepDiff
       # @return [Array]
       def array_deletion(delta)
         delta.left - delta.right
-      end
-
-      # Visual representation of keys from compared objects needed to fetch the compared values
-      # @return [String]
-      def path(delta)
-        delta.change_key.map { |key| "[#{key}]" }.join
       end
 
       # visual indication of addition
