@@ -21,3 +21,7 @@ Metrics/BlockLength:
     - '*.gemspec'
 Style/YodaCondition:
   EnforcedStyle: require_for_all_comparison_operators
+
+Minitest/AssertEmptyLiteral:
+  Exclude:
+    - 'test/unit/test_change_key.rb'
