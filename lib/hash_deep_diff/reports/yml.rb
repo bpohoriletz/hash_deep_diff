@@ -2,6 +2,7 @@
 
 require_relative 'base'
 require 'forwardable'
+require 'yaml'
 
 module HashDeepDiff
   # Different reporting enjines for {Delta}

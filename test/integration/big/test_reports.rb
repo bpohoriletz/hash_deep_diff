@@ -8,17 +8,6 @@ describe 'Integration tests: ' do
       <<~Q
         -left[b][c][e] = {}
         +left[b][c][e] = [1, 2, 3]
-        -left[b][c][e][f] = {}
-        -left[b][c][e][f][g] = [1, 2, 3]
-        -left[b][c][e][h] = {}
-        -left[b][c][e][h][i] = {}
-        -left[b][c][e][h][i][j] = {}
-        -left[b][c][e][h][i][j][k] = k
-        -left[b][c][e][h][i][j][l] = l
-        -left[b][c][e][h][i][m] = m
-        -left[b][c][e][h][n] = n
-        -left[b][c][e][o] = o
-        -left[b][c][e][p] = [1, 2, 3]
         -left[b][c][r] = r
         -left[b][c][s] = {}
         -left[b][c][s][t] = t

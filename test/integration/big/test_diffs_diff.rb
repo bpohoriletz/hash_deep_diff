@@ -6,17 +6,6 @@ describe 'Integration tests: ' do
   describe '[BIG]HashDeepDiff::Comparison#diff' do
     let(:expectation) do
       [{ e: { left: HashDeepDiff::NO_VALUE, right: {} } },
-       { f: { left: HashDeepDiff::NO_VALUE, right: {} } },
-       { g: { left: HashDeepDiff::NO_VALUE, right: [1, 2, 3] } },
-       { h: { left: HashDeepDiff::NO_VALUE, right: {} } },
-       { i: { left: HashDeepDiff::NO_VALUE, right: {} } },
-       { j: { left: HashDeepDiff::NO_VALUE, right: {} } },
-       { k: { left: HashDeepDiff::NO_VALUE, right: 'k' } },
-       { l: { left: HashDeepDiff::NO_VALUE, right: 'l' } },
-       { m: { left: HashDeepDiff::NO_VALUE, right: 'm' } },
-       { n: { left: HashDeepDiff::NO_VALUE, right: 'n' } },
-       { o: { left: HashDeepDiff::NO_VALUE, right: 'o' } },
-       { p: { left: HashDeepDiff::NO_VALUE, right: [1, 2, 3] } },
        { e: { left: [1, 2, 3], right: HashDeepDiff::NO_VALUE } },
        { r: { left: HashDeepDiff::NO_VALUE, right: 'r' } },
        { s: { left: HashDeepDiff::NO_VALUE, right: {} } },
