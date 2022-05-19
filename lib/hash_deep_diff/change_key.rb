@@ -24,32 +24,34 @@ module HashDeepDiff
     end
 
     # set the value inside Hash based on the change_key
-    def self.dig_set(obj, keys, value)
-      key = keys.shift
-      if NESTED_HASH == key
+    # @return [Array, Hash]
+    # TOFIX; check if @path are mutated
+    def set(obj, value, clone_keys = path.clone)
+      current_key = clone_keys.shift
+      if NESTED_HASH == current_key
         obj << {} unless obj[-1].respond_to?(:to_hash)
-        dig_set(obj[-1], keys, value)
-      elsif ARRAY_VALUE == key
+        set(obj[-1], value, clone_keys)
+      elsif ARRAY_VALUE == current_key
         obj.prepend(*value)
-      elsif keys.empty?
-        obj[key] = value
-      elsif [ARRAY_VALUE] == keys
-        obj[key] ||= []
-        obj[key] = value + obj[key]
-      elsif NESTED_HASH == keys[0]
-        set_nested_hash(obj, key, keys)
-        dig_set(obj[key][-1], keys, value)
+      elsif clone_keys.empty?
+        obj[current_key] = value
+      elsif [ARRAY_VALUE] == clone_keys
+        obj[current_key] ||= []
+        obj[current_key] = value + obj[current_key]
+      elsif NESTED_HASH == clone_keys[0]
+        set_nested_hash(obj, current_key, clone_keys)
+        set(obj[current_key][-1], value, clone_keys)
       else
-        obj[key] ||= {}
-        dig_set(obj[key], keys, value)
+        obj[current_key] ||= {}
+        set(obj[current_key], value, clone_keys)
       end
 
       return obj
     end
 
     # TOFIX; Introduce change key object
-    def self.set_nested_hash(obj, key, keys)
-      keys.shift
+    def set_nested_hash(obj, key, clone_keys)
+      clone_keys.shift
       obj[key] ||= []
       obj[key] << {} unless obj[key][-1].respond_to?(:to_hash)
     end
@@ -63,7 +65,7 @@ module HashDeepDiff
     # array with keysused to initialize the object
     # @return [Array]
     def to_ary
-      keys
+      path
     end
 
     # see {#to_str}
@@ -75,15 +77,15 @@ module HashDeepDiff
     # visual representation of the change key
     # @return [String]
     def to_str
-      keys.map { |key| "[#{key}]" }.join
+      path.map { |key| "[#{key}]" }.join
     end
 
     private
 
-    attr_reader :keys
+    attr_reader :path
 
-    def initialize(keys:)
-      @keys = keys.to_ary
+    def initialize(path:)
+      @path = path.to_ary
     end
   end
 end

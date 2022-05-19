@@ -6,18 +6,18 @@ describe 'Integration tests: ' do
   describe '[LOCALES]HashDeepDiff::Comparison#raw_report in YML format' do
     let(:uk_ru_raw_report) do
       {
-        additions: [{ faker: [:country_code],
-                      activerecord: [{ models: [{ user: %i[few many one other] }] }],
-                      number: [{ human: [{ storage_units: [{ units: %i[eb pb] }] }],
-                                 percentage: [{ format: [:format] }] }] }],
-        deletions: [{ faker: [{ address: %i[masculine_street_prefix feminine_street_prefix
-                                            street_prefix state_abbr masculine_street_title
-                                            feminine_street_title city_prefix city_suffix],
-                                cell_phone: [:formats],
-                                company: [:product],
-                                music: [:instruments],
-                                artist: [:names] }],
-                      activerecord: [{ models: [:user] }] }]
+        'additions' => [{ faker: [:country_code],
+                          activerecord: [{ models: [{ user: %i[few many one other] }] }],
+                          number: [{ human: [{ storage_units: [{ units: %i[eb pb] }] }],
+                                     percentage: [{ format: [:format] }] }] }],
+        'deletions' => [{ faker: [{ address: %i[masculine_street_prefix feminine_street_prefix
+                                                street_prefix state_abbr masculine_street_title
+                                                feminine_street_title city_prefix city_suffix],
+                                    cell_phone: [:formats],
+                                    company: [:product],
+                                    music: [:instruments],
+                                    artist: [:names] }],
+                          activerecord: [{ models: [:user] }] }]
       }
     end
 

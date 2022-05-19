@@ -5,6 +5,7 @@ require 'test_helper'
 describe HashDeepDiff::ChangeKey do
   let(:spy) { Naught.build }
   let(:described_class) { HashDeepDiff::ChangeKey }
+  let(:instance) { described_class.new(path: []) }
 
   describe '.initial_object' do
     let(:hash_comparison) { [[[:a], :b]] }
@@ -24,52 +25,59 @@ describe HashDeepDiff::ChangeKey do
     end
   end
 
-  describe '.dig_set' do
-    let(:change) { [[:a], :b] }
-    let(:array_change) { [[:a], %i[c d]] }
-    let(:deep_array_change) { [[:a, :b, '...'], %i[b c]] }
-    let(:deep_array_hash_change) { [[:a, :b, '{}', :c], :b] }
-    let(:array_first_change) { [['{}', :a, :b], %i[b c]] }
-    let(:array_first_addition) { [['...'], %i[b c]] }
+  describe '#set' do
+    let(:change) { [:a] }
+    let(:deep_array_change) { [:a, :b, '...'] }
+    let(:deep_array_hash_change) { [:a, :b, '{}', :c] }
+    let(:array_first_hash_change) { ['{}', :a, :b] }
+    let(:array_first_addition) { ['...'] }
+
+    it 'does not mutate object' do
+      instance = described_class.new(path: deep_array_change)
+
+      instance.set({}, %i[b c])
+
+      assert_equal(deep_array_change, instance.to_a)
+    end
 
     it 'sets simple value within Hash' do
       report = { a: :b }
 
-      assert_equal(report, described_class.dig_set({}, change[0], change[1]))
+      assert_equal(report, described_class.new(path: change).set({}, :b))
     end
 
     it 'sets array value within Hash' do
       report = { a: %i[c d] }
 
-      assert_equal(report, described_class.dig_set({}, array_change[0], array_change[1]))
+      assert_equal(report, described_class.new(path: change).set({}, %i[c d]))
     end
 
     it 'sets array value deep within Hash' do
       report = { a: { b: %i[b c] } }
 
-      assert_equal(report, described_class.dig_set({}, deep_array_change[0], deep_array_change[1]))
+      assert_equal(report, described_class.new(path: deep_array_change).set({}, %i[b c]))
     end
 
     it 'sets value of hash within array deep within Hash' do
       report = { a: { b: [:b, :c, { c: :b }] } }
-      result = described_class.dig_set({}, deep_array_change[0], deep_array_change[1])
-      described_class.dig_set(result, deep_array_hash_change[0], deep_array_hash_change[1])
+      result = described_class.new(path: deep_array_change).set({}, %i[b c])
+      described_class.new(path: deep_array_hash_change).set(result, :b)
 
       assert_equal(report, result)
     end
 
     it 'sets value of hash within array deep within Hash - unexpcted order' do
-      report = { a: { b: [:b, :c, { c: :b }] } }
-      result = described_class.dig_set({}, deep_array_hash_change[0], deep_array_hash_change[1])
-      described_class.dig_set(result, deep_array_change[0], deep_array_change[1])
+      report = { a: { b: [:c, :b, { c: :c }] } }
+      result = described_class.new(path: deep_array_hash_change).set({}, :c)
+      described_class.new(path: deep_array_change).set(result, %i[c b])
 
       assert_equal(report, result)
     end
 
     it 'sets value if array was first element' do
-      report = [:b, :c, { a: { b: %i[b c] } }]
-      result = described_class.dig_set([], array_first_change[0], array_first_change[1])
-      described_class.dig_set(result, array_first_addition[0], array_first_addition[1])
+      report = [:b, :c, { a: { b: %i[c b] } }]
+      result = described_class.new(path: array_first_hash_change).set([], %i[c b])
+      described_class.new(path: array_first_addition).set(result, %i[b c])
 
       assert_equal(report, result)
     end

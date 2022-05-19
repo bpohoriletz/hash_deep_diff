@@ -3,22 +3,22 @@
 require 'test_helper'
 
 describe HashDeepDiff::Delta do
-  let(:small) { HashDeepDiff::Delta.new(change_key: [:a], value: { left: :a, right: :b }) }
-  let(:smallmedium) { HashDeepDiff::Delta.new(change_key: [:a], value: { left: { a: :a }, right: :b }) }
-  let(:mediumsmall) { HashDeepDiff::Delta.new(change_key: [:a], value: { left: :a, right: { b: :b } }) }
-  let(:medium) { HashDeepDiff::Delta.new(change_key: [:a], value: { left: { a: :a }, right: { b: :b } }) }
+  let(:small) { HashDeepDiff::Delta.new(path: [:a], value: { left: :a, right: :b }) }
+  let(:smallmedium) { HashDeepDiff::Delta.new(path: [:a], value: { left: { a: :a }, right: :b }) }
+  let(:mediumsmall) { HashDeepDiff::Delta.new(path: [:a], value: { left: :a, right: { b: :b } }) }
+  let(:medium) { HashDeepDiff::Delta.new(path: [:a], value: { left: { a: :a }, right: { b: :b } }) }
   let(:big) do
-    HashDeepDiff::Delta.new(change_key: [:a], value: { left: load_fixture('empty'),
-                                                     right: load_fixture('two_level/small') })
+    HashDeepDiff::Delta.new(path: [:a], value: { left: load_fixture('empty'),
+                                                 right: load_fixture('two_level/small') })
   end
   let(:smallmedium_inside_array) do
-    HashDeepDiff::Delta.new(change_key: [:a], value: { left: [1, 2, { a: :a }], right: :b })
+    HashDeepDiff::Delta.new(path: [:a], value: { left: [1, 2, { a: :a }], right: :b })
   end
   let(:mediumsmall_inside_array) do
-    HashDeepDiff::Delta.new(change_key: [:a], value: { left: :a, right: [{ b: :b }, 2, 3] })
+    HashDeepDiff::Delta.new(path: [:a], value: { left: :a, right: [{ b: :b }, 2, 3] })
   end
   let(:medium_inside_array) do
-    HashDeepDiff::Delta.new(change_key: [:a], value: { left: [1, 2, { a: :a }], right: [{ b: :b }, 2, 3] })
+    HashDeepDiff::Delta.new(path: [:a], value: { left: [1, 2, { a: :a }], right: [{ b: :b }, 2, 3] })
   end
 
   describe '#placebo' do

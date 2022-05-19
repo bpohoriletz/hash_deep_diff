@@ -20,7 +20,7 @@ module HashDeepDiff
     def placebo
       placebo = simple_left? ? { left: NO_VALUE, right: placebo_elment } : { left: placebo_elment, right: NO_VALUE }
 
-      [self.class.new(change_key: change_key, value: placebo)]
+      [self.class.new(path: change_key, value: placebo)]
     end
 
     # true if any value is an +Array+ with hashes
@@ -98,12 +98,12 @@ module HashDeepDiff
 
     attr_reader :value
 
-    # @param [Array] change_key list of keys to fetch values we're comparing
+    # @param [Array] path list of keys to fetch values we're comparing
     # @param [Hash<(:left, :right), Object>] value +Hash+ object with two keys - :left and :right,
     #   that represents compared original value (at :left) and value we compare to (at :right)
-    def initialize(change_key:, value:)
+    def initialize(path:, value:)
       @value = value
-      @change_key = HashDeepDiff::ChangeKey.new(keys: change_key)
+      @change_key = HashDeepDiff::ChangeKey.new(path: path)
     end
 
     # an indication of added/removed nested Hash
