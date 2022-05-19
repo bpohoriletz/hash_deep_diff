@@ -7,7 +7,7 @@ describe 'Integration tests: ' do
     let(:uk_en_report) do
       <<~Q
         ---
-        :additions:
+        additions:
         - :hello
         - :activerecord:
           - :models:
@@ -50,7 +50,7 @@ describe 'Integration tests: ' do
               :destroy:
               - :notice
               - :alert
-        :deletions:
+        deletions:
         - :faker:
           - :separator
           - :address:

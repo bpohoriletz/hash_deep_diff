@@ -21,28 +21,18 @@ module HashDeepDiff
   #       NO_VALUE compared to { one: { three: :c } } compared - value was added
   #         i.e NO_VALUE vas replaced with :c on path [:one, :three]
   #  [
-  #    #<HashDeepDiff::Delta
-  #      @delta={:two=>{:left=>:a, :right=>:b}},
-  #      @prefix=[:one],
+  #    #<HashDeepDiff::Delta:0x00007fc7bc8a6e58
+  #      @change_key=#<HashDeepDiff::ChangeKey:0x00007fc7bc8a6d40 @path=[:one, :two]>,
   #      @value={:left=>:a, :right=>:b}>,
-  #    #<HashDeepDiff::Delta
-  #      @delta={:zero=>{:left=>:z, :right=>HashDeepDiff::NO_VALUE}},
-  #      @prefix=[:one],
+  #    #<HashDeepDiff::Delta:0x00007fc7bc8a6b60
+  #      @change_key=#<HashDeepDiff::ChangeKey:0x00007fc7bc8a6a48 @path=[:one, :zero]>,
   #      @value={:left=>:z, :right=>HashDeepDiff::NO_VALUE}>,
-  #    #<HashDeepDiff::Delta
-  #     @delta={:three=>{:left=>HashDeepDiff::NO_VALUE, :right=>:c}},
-  #     @prefix=[:one],
-  #     @value={:left=>HashDeepDiff::NO_VALUE, :right=>:c}>
+  #    #<HashDeepDiff::Delta:0x00007fc7bc8a6930
+  #      @change_key=#<HashDeepDiff::ChangeKey:0x00007fc7bc8a6818 @path=[:one, :three]>,
+  #      @value={:left=>HashDeepDiff::NO_VALUE, :right=>:c}>]
   #  ]
   class Comparison
     extend Forwardable
-    # @!attribute [r] left
-    #    @return [Hash] original version of the Hash
-    # @!attribute [r] right
-    #    @return [Hash] Hash that the original is compared to
-    # @!attribute [r] path
-    #    @return [Array<Object>] subset of keys from original Hashes to fetch compared values
-    #    (is empty for top-level comparison)
     attr_reader :reporting_engine, :delta_engine
 
     def_delegators :comparison_factory, :comparison
@@ -75,6 +65,9 @@ module HashDeepDiff
 
     private
 
+    # @!attribute [r] path
+    #    @return [Array<Object>] subset of keys from original Hashes to fetch compared values
+    #    (is empty for top-level comparison)
     attr_reader :path
 
     # @param [Object] original original version
@@ -131,10 +124,10 @@ module HashDeepDiff
     # factory function
     # @return [HashDeepDiff::Delta]
     def delta(key: NO_VALUE)
-      change_key = path
-      change_key += [key] unless key == NO_VALUE
+      keys = path
+      keys += [key] unless key == NO_VALUE
 
-      HashDeepDiff::Delta.new(change_key: change_key, value: { left: left(key), right: right(key) })
+      HashDeepDiff::Delta.new(path: keys, value: { left: left(key), right: right(key) })
     end
 
     # @return [HashDeepDiff::Factories::Comparison]
