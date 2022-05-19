@@ -7,7 +7,7 @@ Status](https://img.shields.io/github/workflow/status/bpohoriletz/hash_deep_diff
 
 Find the exact difference between two Hash objects and build a report to visualize it. Works for other objects too but why would you do that :/
 
-Alternative solutions [hashdiff by liufengyun](https://github.com/liufengyun/hashdiff) and [hash_hdiff by CodingZeal](https://github.com/CodingZeal/hash_diff)
+Alternative solutions [hashdiff](https://github.com/liufengyun/hashdiff) by liufengyun and [hash_diff](https://github.com/CodingZeal/hash_diff) by CodingZeal
 
 ## Installation
 
@@ -26,20 +26,92 @@ Or install it yourself as:
     $ gem install hash_deep_diff
 
 ## Usage
-Basic example
+### Basic
 
 ```ruby
 left = { a: :a }
 right = { a: :b }
 
-HashDeepDiff::Comparison.new(left, right).report
+print HashDeepDiff::Comparison.new(left, right).report
 ```
 ```diff
 - left[a] = a
 + left[a] = b
 ```
+### Arrays
+```ruby
+left = [1, 2, { a: :a }]
+right = [2, { a: :b }, 3]
+
+print HashDeepDiff::Comparison.new(left, right).report
+```
+```diff
+-left[...] = [1]
++left[...] = [3]
+-left[{}][a] = a
++left[{}][a] = b
+```
+### Nesting
+```ruby
+left  = { a: [1, 2, { a: :a } ], b: { c: [1, 2, { d: :e } ] } }
+right = { a: [2, { a: :b }, 3], b: { c: { f: { g: :h } } } }
+
+print HashDeepDiff::Comparison.new(left, right).report
+```
+```diff
+-left[a][...] = [1]
++left[a][...] = [3]
+-left[a][{}][a] = a
++left[a][{}][a] = b
++left[b][c][...][f] = {}
++left[b][c][...][f][g] = h
+-left[b][c][...][f] = [1, 2]
+-left[b][c][{}][d] = e
+```
+### Reporting Engines
+You can choose from the default diff-like reporting engine (examples are above) and YML reporting engine
+
+```ruby
+left  = { a: [1, 2, { a: :a } ], b: { c: [1, 2, { d: :e } ] } }
+right = { a: [2, { a: :b }, 3], b: { c: { f: { g: :h } } } }
+```
+#### Raw Report
+
+```ruby
+print HashDeepDiff::Comparison.new(left, right, reporting_engine: HashDeepDiff::Reports::Yml).raw_report
+=> {"additions"=>{:a=>[3, {:a=>:b}], :b=>{:c=>[{:f=>{:g=>:h}}]}},
+    "deletions"=>{:a=>[1, {:a=>:a}], :b=>{:c=>[1, 2, {:d=>:e}]}}}
+```
+
+#### YML Report
+
+```ruby
+print HashDeepDiff::Comparison.new(left, right, reporting_engine: HashDeepDiff::Reports::Yml).report
+
+---
+additions:
+  :a:
+  - 3
+  - :a: :b
+  :b:
+    :c:
+    - :f:
+        :g: :h
+deletions:
+  :a:
+  - 1
+  - :a: :a
+  :b:
+    :c:
+    - 1
+    - 2
+    - :d: :e
+```
+
 please see [Documentation](https://rdoc.info/gems/hash_deep_diff/HashDeepDiff/Comparison) for
 more information or [Reporting test](https://github.com/bpohoriletz/hash_deep_diff/blob/a525d239189b0310aec3741dfc4862834805252d/test/integration/locales/test_uk_ru.rb#L59)
+
+
 
 ## Customization
 
