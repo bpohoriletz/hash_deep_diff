@@ -28,32 +28,12 @@ module HashDeepDiff
     # TOFIX; check if @path are mutated
     def set(obj, value, clone_keys = path.clone)
       current_key = clone_keys.shift
-      if NESTED_HASH == current_key
-        obj << {} unless obj[-1].respond_to?(:to_hash)
-        set(obj[-1], value, clone_keys)
-      elsif ARRAY_VALUE == current_key
-        obj.prepend(*value)
-      elsif clone_keys.empty?
-        obj[current_key] = value
-      elsif [ARRAY_VALUE] == clone_keys
-        obj[current_key] ||= []
-        obj[current_key] = value + obj[current_key]
-      elsif NESTED_HASH == clone_keys[0]
-        set_nested_hash(obj, current_key, clone_keys)
-        set(obj[current_key][-1], value, clone_keys)
-      else
-        obj[current_key] ||= {}
-        set(obj[current_key], value, clone_keys)
-      end
+      set_initial_value(current_key, obj, clone_keys)
+      set_value(current_key, obj, value, clone_keys)
+      prepare_nesting(current_key, obj, clone_keys)
+      recursive_set(current_key, obj, value, clone_keys)
 
       return obj
-    end
-
-    # TOFIX; Introduce change key object
-    def set_nested_hash(obj, key, clone_keys)
-      clone_keys.shift
-      obj[key] ||= []
-      obj[key] << {} unless obj[key][-1].respond_to?(:to_hash)
     end
 
     # see {#to_ary}
@@ -86,6 +66,51 @@ module HashDeepDiff
 
     def initialize(path:)
       @path = path.to_ary
+    end
+
+    def set_initial_value(current_key, obj, clone_keys)
+      if NESTED_HASH == current_key
+        obj << {} unless obj[-1].respond_to?(:to_hash)
+      elsif [ARRAY_VALUE] == clone_keys
+        obj[current_key] ||= []
+      elsif NESTED_HASH == clone_keys[0]
+        obj[current_key] ||= []
+        obj[current_key] << {} unless obj[current_key][-1].respond_to?(:to_hash)
+      elsif !clone_keys.empty? && ARRAY_VALUE != current_key
+        obj[current_key] ||= {}
+      end
+    end
+
+    def set_value(current_key, obj, value, clone_keys)
+      if ARRAY_VALUE == current_key
+        obj.prepend(*value)
+        clone_keys.pop
+      elsif clone_keys.empty? && obj.respond_to?(:to_hash)
+        obj[current_key] = value
+        clone_keys.pop
+      elsif [ARRAY_VALUE] == clone_keys
+        obj[current_key] ||= []
+        obj[current_key] = value + obj[current_key]
+        clone_keys.pop
+      end
+    end
+
+    def prepare_nesting(current_key, obj, clone_keys)
+      if NESTED_HASH == current_key
+        obj << {} unless obj[-1].respond_to?(:to_hash)
+      elsif NESTED_HASH == clone_keys[0]
+        obj[current_key] << {} unless obj[current_key][-1].respond_to?(:to_hash)
+      end
+    end
+
+    def recursive_set(current_key, obj, value, clone_keys)
+      if NESTED_HASH == current_key
+        set(obj[-1], value, clone_keys)
+      elsif NESTED_HASH == clone_keys[0]
+        set(obj[current_key][-1], value, clone_keys[1..])
+      elsif !clone_keys.empty?
+        set(obj[current_key], value, clone_keys)
+      end
     end
   end
 end
