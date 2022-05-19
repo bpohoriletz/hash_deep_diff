@@ -6,17 +6,6 @@ describe 'Integration tests: ' do
   describe '[BIG]HashDeepDiff::Comparison#diff' do
     let(:expectation) do
       [%i[b c e],
-       %i[b c e f],
-       %i[b c e f g],
-       %i[b c e h],
-       %i[b c e h i],
-       %i[b c e h i j],
-       %i[b c e h i j k],
-       %i[b c e h i j l],
-       %i[b c e h i m],
-       %i[b c e h n],
-       %i[b c e o],
-       %i[b c e p],
        %i[b c e],
        %i[b c r],
        %i[b c s],

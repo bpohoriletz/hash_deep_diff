@@ -54,6 +54,7 @@ module HashDeepDiff
       # original value without nested hashes
       # @return [Object]
       def value_left
+        return NO_VALUE if left.respond_to?(:to_hash) && right.respond_to?(:to_ary)
         return left unless left.respond_to?(:to_ary)
 
         left.reject { |el| el.respond_to?(:to_hash) }
@@ -62,6 +63,7 @@ module HashDeepDiff
       # changed value without nested hashes
       # @return [Object]
       def value_right
+        return NO_VALUE if right.respond_to?(:to_hash) && left.respond_to?(:to_ary)
         return right unless right.respond_to?(:to_ary)
 
         right.reject { |el| el.respond_to?(:to_hash) }
@@ -70,6 +72,7 @@ module HashDeepDiff
       # nested hashes from original value
       # @return [Array<Hash>]
       def nesting_left
+        return left if left.respond_to?(:to_hash)
         return NO_VALUE unless complex_left?
 
         left
@@ -80,6 +83,7 @@ module HashDeepDiff
       # nested hashes from changed value
       # @return [Array<Hash>]
       def nesting_right
+        return right if right.respond_to?(:to_hash)
         return NO_VALUE unless complex_right?
 
         right

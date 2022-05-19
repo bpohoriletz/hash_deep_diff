@@ -12,7 +12,7 @@ describe HashDeepDiff::Delta do
                                                  right: load_fixture('two_level/small') })
   end
   let(:smallmedium_inside_array) do
-    HashDeepDiff::Delta.new(path: [:a], value: { left: [1, 2, { a: :a }], right: :b })
+    HashDeepDiff::Delta.new(path: [:a], value: { left: [1, 2, { a: :a }], right: { b: :c } })
   end
   let(:mediumsmall_inside_array) do
     HashDeepDiff::Delta.new(path: [:a], value: { left: :a, right: [{ b: :b }, 2, 3] })
